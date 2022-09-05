@@ -2,80 +2,37 @@
 
 class Response_helper {
 
-    public static function compileResponseMsg( $message="", $data=array(), $source="ResponseHelper", $status=200 )
-    {
-        if( empty( $data ) ) {
-            $status = 204; 
-            $message = "Request succeeded, but no content returned";
-        }
-        return self::compileMsg(
-            $error=FALSE,
-            $issue_id="ResponseHelper_00001",
-            $message=( strlen($message) > 0 && empty($data) )?$message:"Success",
-            $data=$data, 
-            $status_code=( empty($data) ) ? 201 : 200, 
-            $log=FALSE, 
-            $private=FALSE, 
-            $continue=TRUE, 
-            $email=FALSE, 
-            $source=$source
-        );
-    }
-    public static function compileSuccessMsg($issue_id="ResponseHelper_00002", $message="Success",$data=array(), $status_code=200, $log=false, $private=false, $continue=true, $email=false, $source="ResponseHelper"){
-        return self::compileMsg(
-            $error=FALSE,
-            $issue_id=$issue_id, 
-            $message=$message,
-            $data=$data, 
-            $status_code=$status_code, 
-            $log=$log, 
-            $private=$private, 
-            $continue=$continue, 
-            $email=$email, 
-            $source=$source
-        );
-    }
+    public static function compile_msg( $args ) {
 
-    public static function compileErrorMsg($issue_id="ResponseHelper_00003", $message="",$data=array(), $status_code=500, $log=false, $private=false, $continue=true, $email=false, $source="ResponseHelper") {
-        return self::compileMsg(
-            $error=TRUE,
-            $issue_id=$issue_id, 
-            $message=$message,
-            $data=$data, 
-            $status_code=$status_code, 
-            $log=$log, 
-            $private=$private, 
-            $continue=$continue, 
-            $email=$email, 
-            $source=$source
-        );
+        $default_args = array(
+            'error'       => true,
+            'issue_id'    => 'response_helper_001', // string 
+            'message'     => '', // string
+            'data'        => array(),
+            'status_code' => 500, 
+            'log'         => false,
+            'private'     => true,
+            'continue'    => true,
+            'email'       => false,
+            'source'      => get_class( $this )
+        ); 
 
-    }
+        $args = array_merge( $args, $default_args );
 
-    public static function compileMsg($error=false, $issue_id="", $message="",$data=array(), $status_code=500, $log=false, $private=false, $continue=false, $email=false, $source="ResponseHelper") {
-        
-        if(empty($data) && $error ) {
-            $data = array( 
-                'display_message' => $message
-            );
-        }
-
-        $results = array( 
-            'status' => $status_code,
-            'error'  => $error,
+        return array( 
+            'status' => $args[ 'status' ],
+            'error'  => $args[ 'error' ],
             'system' => array(
-                'issue_id' => $issue_id,
-                'log'      => $log, 
-                'private'  => $private, 
-                'continue' => $continue, 
-                'email'    => $email
+                'issue_id' => $args[ 'issue_id' ],
+                'log'      => $args[ 'log' ], 
+                'private'  => $args[ 'private' ], 
+                'continue' => $args[ 'continue' ], 
+                'email'    => $args[ 'email' ]
             ),
-            'source'  => $source,
-            'message' => strlen( $message ) > 0 ? $message : " Unknown Error". "\n", 
-            'data' => $data
+            'source'  => $args[ 'source' ],
+            'message' => $args[ 'message' ], 
+            'data' => $args[ 'data' ]
         );
-
-        return $results;
 
     }
 
