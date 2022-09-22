@@ -1,0 +1,6 @@
+Options -Indexes
+RewriteEngine on
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_URI}  !(\.png|\.jpg|\.gif|\.jpeg|\.bmp|\.mov|\.mpeg|\.mpg|\.avi|\.m4v|\.mov|\.pdf|\.json|\.xls|\.csv|\.mp3|\.mp4|\.wav|\.wma|\.ogg})$
+RewriteRule . index.php [L]

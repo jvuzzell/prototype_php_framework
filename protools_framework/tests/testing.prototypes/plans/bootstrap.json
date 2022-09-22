@@ -1,0 +1,16 @@
+{
+    "name" : "Bootstrap Test Plan", 
+    "description" : "This plan ensures that the ProTools framework is working as expected", 
+    "version" : "1.0",
+    "repositories" : [
+        "protools_framework",
+        "delivery_system"
+    ], 
+    "environment" : {
+        "server" : "dev", 
+        "site" : "prototypes.dv"
+    }, 
+    "test_suites" : [
+        "bootstrap"
+    ]
+}
