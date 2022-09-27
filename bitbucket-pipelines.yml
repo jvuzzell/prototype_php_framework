@@ -1,23 +1,9 @@
-# Template PHP Build
-
-# This template allows you to validate your PHP application.
-# The workflow allows running tests and code linting on the default branch.
-
 image: php:8.1.0-fpm
-
 
 pipelines:
   default:
-      - step:
-          name: Install Composer
-          caches: 
-            - composer-bin-cache
-          script:
-            - php --version
-            - pwd
+    - step:
+        script:
           - apt-get update && apt-get install -y unzip
           - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
           - composer install
-            
-
-
