@@ -1,0 +1,12 @@
+{
+    "name" : "Bootstrap Test Plan", 
+    "description" : "This plan ensures that the ProTools framework is working as expected", 
+    "version" : "1.0",
+    "code" : [ 
+        "protools_framework" 
+    ],
+    "test_suites" : [
+        "bootstrap", 
+        "bootstrap_copy"
+    ]
+}

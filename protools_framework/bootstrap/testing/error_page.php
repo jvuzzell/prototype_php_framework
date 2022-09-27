@@ -36,7 +36,7 @@ $display_env_variable = ( ENV_NAME !== 'prod' ) ? "(" . strtoupper( ENV_NAME ) .
                                 if( !$private || ENV_NAME == 'dev' ) :
                             ?>
                             <form>
-                                <textarea name="" id="" cols="30" rows="10" style="min-height: 500px;"><?php echo( json_encode( $response_data, JSON_PRETTY_PRINT ) ); ?></textarea>
+                                <textarea name="" id="" cols="150" rows="10" style="min-height: 500px;"><?php echo( json_encode( $response_data, JSON_PRETTY_PRINT ) ); ?></textarea>
                             </form>
 
                             <?php endif; ?>

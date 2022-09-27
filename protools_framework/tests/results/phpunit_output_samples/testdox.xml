@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tests>
+  <test className="Tests\Scripts\Zubair\UserTest" methodName="testClassConstructor" prettifiedClassName="User (Tests\Scripts\Zubair\User)" prettifiedMethodName="Class constructor" status="0" time="0.001053416" size="-1" groups="default">
+    <group name="default"/>
+  </test>
+  <test className="Tests\Scripts\Zubair\UserTest" methodName="testTellName" prettifiedClassName="User (Tests\Scripts\Zubair\User)" prettifiedMethodName="Tell name" status="0" time="0.000204875" size="-1" groups="default">
+    <group name="default"/>
+  </test>
+  <test className="Tests\Scripts\Zubair\UserTest" methodName="testTellAge" prettifiedClassName="User (Tests\Scripts\Zubair\User)" prettifiedMethodName="Tell age" status="0" time="3.25E-5" size="-1" groups="default">
+    <group name="default"/>
+  </test>
+  <test className="Tests\Scripts\Zubair\UserTest" methodName="testAddFavoriteMovie" prettifiedClassName="User (Tests\Scripts\Zubair\User)" prettifiedMethodName="Add favorite movie" status="0" time="0.000198833" size="-1" groups="default">
+    <group name="default"/>
+  </test>
+  <test className="Tests\Scripts\Zubair\UserTest" methodName="testRemoveFavoriteMovie" prettifiedClassName="User (Tests\Scripts\Zubair\User)" prettifiedMethodName="Remove favorite movie" status="0" time="0.000182917" size="-1" groups="default">
+    <group name="default"/>
+  </test>
+</tests>

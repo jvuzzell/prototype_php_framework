@@ -1,6 +1,14 @@
 <?php 
 
-// @TODO Kill direct access
+use Symfony\Component\Filesystem\Filesystem as Filesystem; 
+use Symfony\Component\Filesystem\Path as Path; 
+use Symfony\Component\Process\Process as Process;
+
+use Bootstrap\Shared\Utilities\Classes\Environment_configuration as Environment_configuration; 
+use Bootstrap\Shared\Utilities\Classes\Json_validator as Json_validator;
+use Bootstrap\Shared\Utilities\Classes\Api_response as Api_response;
+
+use Bootstrap\Testing\Library\Classes\Test_plan as Test_plan;
 
 /**
  * @TODO
@@ -11,43 +19,25 @@
  * 
  */
 
-$request = Test_router::get_test_plan( $Environment_config->get_env_config()[ 'app_path' ] );
+$Test_plan = new Test_plan( 
+    $Environment_config, 
+    new Json_validator, 
+    new Api_response, 
+    new Filesystem
+);
 
-// if( $request[ 'error' ] ) {
-    
-//     if( IS_CLI ) {
-        
-//         // Instantiate Test Plan based 
-//         Api_response::print_json( $request[ 'status' ], $request, 'dev' );  
+$test_response = $Test_plan->launch_tests();
 
-//     } else {
-
-//         Api_response::route_to_custom_page( 404, $request, ERROR_PAGE, 'dev' );
-
-//     }
-    
+// if( $test_response[ 'error' ] ) {
+//     Api_response::print_json( $test_response );
+// } else { 
+//     $Test_plan->compile_report( $test_response[ 'data' ][ 'test_report_file' ] );
 // }
 
-// $request_route = $request[ 'data' ][ 'route' ]; 
-
-// //Dump_var::dump( Test_router::get_test_plan( $request_route ) );
-
-// $Assertions = new Assertions();
-// $Test_case = new Test_case( $Assertions );
 
 
-// $files_to_find = array(
-//     '*.php'
-// );
+// Dump_var::print( $Test_plan->get_plan_summary()[ 'data' ] );
 
-// $search_args = array(
-//     'starting_directory' => SHARED_LIBRARY_DIR,
-//     'search_direction' => 'children'
-// );
-
-// Dump_var::print( $Directory_search->cwd() );
-
-// Dump_var::print( $Directory_search->search( $files_to_find, $search_args ) );
-
-
+// Dump_var::print( $Test_plan->get_test_report() );
+ 
 

@@ -1,0 +1,11 @@
+{
+    "name" : "Successful Test Suite",
+    "description" : "Test multiple scenarios regarding the base ProTools Framework",
+    "test_cases" : {
+        "UserTests" : {
+            "test_type" : "unit-test",
+            "description" : "Evaluates Successful user tests",
+            "script_location" : "Zubair/UserTest.php"
+        }
+    }
+}

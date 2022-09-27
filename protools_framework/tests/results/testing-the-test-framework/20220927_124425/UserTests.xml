@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Scripts\Zubair\UserTest" file="/Users/joshuauzzell/Sites/_prototypes/protools_framework/tests/scripts/Zubair/UserTest.php" tests="5" assertions="15" errors="0" warnings="0" failures="0" skipped="0" time="0.002197">
+    <testcase name="testClassConstructor" class="Tests\Scripts\Zubair\UserTest" classname="Tests.Scripts.Zubair.UserTest" file="/Users/joshuauzzell/Sites/_prototypes/protools_framework/tests/scripts/Zubair/UserTest.php" line="9" assertions="3" time="0.001216"/>
+    <testcase name="testTellName" class="Tests\Scripts\Zubair\UserTest" classname="Tests.Scripts.Zubair.UserTest" file="/Users/joshuauzzell/Sites/_prototypes/protools_framework/tests/scripts/Zubair/UserTest.php" line="18" assertions="2" time="0.000150"/>
+    <testcase name="testTellAge" class="Tests\Scripts\Zubair\UserTest" classname="Tests.Scripts.Zubair.UserTest" file="/Users/joshuauzzell/Sites/_prototypes/protools_framework/tests/scripts/Zubair/UserTest.php" line="26" assertions="2" time="0.000046"/>
+    <testcase name="testAddFavoriteMovie" class="Tests\Scripts\Zubair\UserTest" classname="Tests.Scripts.Zubair.UserTest" file="/Users/joshuauzzell/Sites/_prototypes/protools_framework/tests/scripts/Zubair/UserTest.php" line="34" assertions="3" time="0.000164"/>
+    <testcase name="testRemoveFavoriteMovie" class="Tests\Scripts\Zubair\UserTest" classname="Tests.Scripts.Zubair.UserTest" file="/Users/joshuauzzell/Sites/_prototypes/protools_framework/tests/scripts/Zubair/UserTest.php" line="43" assertions="5" time="0.000621"/>
+  </testsuite>
+</testsuites>

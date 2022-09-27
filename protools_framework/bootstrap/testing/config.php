@@ -3,20 +3,6 @@
 // @TODO Exit if accessed directly 
 
 /**
- * @TODO 
- * 
- * 4. Include classes for testing framework 
- * 5. Include classes for bootstrap frameworks 
- */
-
- /**
- * Create Timestamp
- */
-
-$now       = new DateTime( "now", new DateTimeZone( 'US/EASTERN' ) );
-$timestamp = $now->format( "m-d-Y_h-i-s" );  
-
-/**
  * Global File Paths
  */
 
@@ -29,44 +15,15 @@ if ( !defined( 'LIBRARY_DIR' ) ) {
 }
 
 if ( !defined( 'SHARED_LIBRARY_DIR' ) ) {
-    define( 'SHARED_LIBRARY_DIR', __DIR__ . '/../shared_library' );
+    define( 'SHARED_LIBRARY_DIR', __DIR__ . '/../shared' );
 }
 
-/**
- * Include Class Files
- */
-
-foreach( glob( LIBRARY_DIR . '/classes/static/*.php' ) as $filename ) {
-    require_once( $filename );
-} 
-
-foreach( glob( LIBRARY_DIR . '/interfaces/*.php' ) as $filename ) {
-    require_once( $filename );
-} 
-
-foreach( glob( LIBRARY_DIR . '/classes/*.php' ) as $filename ) {
-    require_once( $filename );
-} 
-
-foreach( glob( SHARED_LIBRARY_DIR . '/utilities/interfaces/*.php' ) as $filename ) {
-    require_once( $filename );
-} 
-
-foreach( glob( SHARED_LIBRARY_DIR . '/utilities/classes/*.php' ) as $filename ) {
-    require_once( $filename );
-} 
-
-foreach( glob( SHARED_LIBRARY_DIR . '/utilities/classes/static/*.php' ) as $filename ) {
-    require_once( $filename );
-}
-
-require_once( SHARED_LIBRARY_DIR . '/utilities/functions/universal_error_handling.php' );
+require_once( SHARED_LIBRARY_DIR . '/vendor/autoload.php' );
+require_once( __DIR__ . '/../../autoload.php' );
 
 /**
  * Encryption classes
  */
-
-require_once( SHARED_LIBRARY_DIR . '/vendor/sodium_compat-1.18.0/autoload.php' );
 
 if( ! defined( 'ENCRYPT_KEY' ) ) {
     define( 'ENCRYPT_KEY', \Sodium\randombytes_buf( \Sodium\CRYPTO_SECRETBOX_KEYBYTES ) );
@@ -77,26 +34,44 @@ if( ! defined( 'ENCRYPT_NONCE' ) ) {
 }
 
 /**
+ * Import classes
+ */
+
+use Bootstrap\Shared\Utilities\Classes\Static\Response_helper as Response_helper;
+use Bootstrap\Shared\Utilities\Classes\Api_response as Api_response;
+use Bootstrap\Shared\Utilities\Classes\Curl_client as Curl_client; 
+use Bootstrap\Shared\Utilities\Classes\Database_pdo_client as Database_pdo_client;
+use Bootstrap\Shared\Utilities\Classes\Directory_search as Directory_search;
+use Bootstrap\Shared\Utilities\Classes\Json_validator as Json_validator;
+use Sodium\crypto_secretbox;
+use Sodium\crypto_secretbox_open;
+
+require_once( SHARED_LIBRARY_DIR . '/utilities/functions/universal_error_handling.php' );
+require_once( SHARED_LIBRARY_DIR . '/utilities/classes/static/Dump_var.php' );
+
+/**
  * Instantiate Global Utilities
  */
 
 $Directory_search = new Directory_search();
 $Json_validator = new Json_validator();
+$Api_response = new Api_response();
 
 /**
  * Environment Configuration
  */
 
 $env_args = array(
+
     'site_directory' => __DIR__,
     'encryption_key' => ENCRYPT_KEY,
     'encryption_nonce' => ENCRYPT_NONCE,
     'dependencies' => array(
         'classes' => array(
-            'directory_search_class' => $Directory_search
+            'Directory_search' => $Directory_search, 
+            'Api_response' => $Api_response
         ), 
         'methods' => array(
-            'get_response' => 'Response_helper::get_message', 
             'encryption_method' => '\Sodium\crypto_secretbox',
             'decryption_method' => '\Sodium\crypto_secretbox_open'
         )  
@@ -105,58 +80,45 @@ $env_args = array(
         // environment_config will attemtpt to detect client config in data source 
         // file based on array key, otherwise it will create a class with the same name as the key
         'curl' => array(
-            'protools_api' => new Curl_client(), 
-            'atlassian_rest_api'  => new Curl_client()
+            'protools_api' => new Curl_client, 
+            'atlassian_rest_api'  => new Curl_client
         ), 
         'databases' => array(
-            'cms_database' => new Database_pdo_client() 
+            'cms_database' => new Database_pdo_client 
         ), 
         'email' => array()
     )
 ); 
 
-$Environment_config = new Environment_configuration( $env_args );
+$Environment_config = new Bootstrap\Shared\Utilities\Classes\Environment_configuration( $env_args );
 
 if( ! defined( 'ENV_NAME' ) ) {
     define( 'ENV_NAME', $Environment_config->get_env_config()[ 'env_name' ] );
 }
 
-// Validate clients
-if( $Environment_config->get_client( 'protools_api' )[ 'error' ] ) { 
+/**
+ * Validate clients
+ */
 
-    $env_config_client_response = $Environment_config->get_client( 'protools_api' )[ 'error' ]; 
+check_client_error( $Environment_config, 'protools_api' );
+check_client_error( $Environment_config, 'atlassian_rest_api' );
+check_client_error( $Environment_config, 'cms_database' );
 
-    if( IS_CLI ) {
-        Api_response::print_json( $env_config_client_response[ 'status' ], $env_config_client_response, ENV_NAME );
-    } else {
-        Api_response::route_to_custom_page( $env_config_client_response[ 'status' ], $env_config_client_response, ERROR_PAGE, ENV_NAME );
-    }
+function check_client_error( $Environment_config, $client_name ) {
 
-} 
+    if( $Environment_config->get_client( $client_name )[ 'error' ] ) { 
 
-if( $Environment_config->get_client( 'atlassian_rest_api' )[ 'error' ] ) { 
+        $env_config_client_response = $Environment_config->get_client( $client_name ); 
+    
+        if( IS_CLI ) {
+            $Api_response::print_json( $env_config_client_response[ 'status' ], $env_config_client_response, ENV_NAME );
+        } else {
+            $Api_response::route_to_custom_page( $env_config_client_response[ 'status' ], $env_config_client_response, ERROR_PAGE, ENV_NAME );
+        }
+    
+    } 
 
-    $env_config_client_response = $Environment_config->get_client( 'atlassian_rest_api' )[ 'error' ]; 
-
-    if( IS_CLI ) {
-        Api_response::print_json( $env_config_client_response[ 'status' ], $env_config_client_response, ENV_NAME );
-    } else {
-        Api_response::route_to_custom_page( $env_config_client_response[ 'status' ], $env_config_client_response, ERROR_PAGE, ENV_NAME );
-    }
-
-} 
-
-if( $Environment_config->get_client( 'cms_database' )[ 'error' ] ) { 
-
-    $env_config_client_response = $Environment_config->get_client( 'cms_database' )[ 'error' ]; 
-
-    if( IS_CLI ) {
-        Api_response::print_json( $env_config_client_response[ 'status' ], $env_config_client_response, ENV_NAME );
-    } else {
-        Api_response::route_to_custom_page( $env_config_client_response[ 'status' ], $env_config_client_response, ERROR_PAGE, ENV_NAME );
-    }
-
-} 
+}
 
 $_SERVER[ 'REQUEST_SCHEME' ] = $Environment_config->get_request_protocol();
 
