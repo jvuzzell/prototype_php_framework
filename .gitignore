@@ -1,3 +1,4 @@
 .DS_store
 data_sources.inc
 env_domains.inc
+vendor/
