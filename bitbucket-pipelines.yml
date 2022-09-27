@@ -13,6 +13,8 @@ pipelines:
           script:
             - pwd
             - ll
+            - cd protools_framework/bootstrap/testing/
+            - php index.php testing.prototypes.dv/testing
       - step:
           name: 'Lint'
           script:
