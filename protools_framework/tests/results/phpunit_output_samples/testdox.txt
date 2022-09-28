@@ -1,7 +1,0 @@
-User (Tests\Scripts\Zubair\User)
- [x] Class constructor
- [x] Tell name
- [x] Tell age
- [x] Add favorite movie
- [ ] Remove favorite movie
-

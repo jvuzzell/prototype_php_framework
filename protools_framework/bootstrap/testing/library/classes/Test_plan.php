@@ -13,6 +13,8 @@ use Bootstrap\Shared\Utilities\Classes\Api_response as Api_response;
 
 use \Exception;
 use \Dump_var;
+use \XMLWriter;
+use \DOMDocument;
 
 /** 
  * @TODO 
@@ -347,33 +349,32 @@ class Test_plan {
 
     }
 
-    Public function launch_tests() : array {
+    Public function run_tests() : array {
     
         $Filesystem = $this->Filesystem;
         $env_config = $this->Env_config->get_env_config(); 
         $test_directory = $env_config[ 'directories' ][ 'tests' ][ 'shared' ]; 
-
+    
         $timestamp = $this->Env_config->get_datetime_now( "Ymd_His" ); 
         $plan_summary = $this->plan_summary; 
         $plan_name = strtolower( str_replace( ' ', '-', $plan_summary[ 'test_plan' ]['name' ] ) );
-        $execution_id = $timestamp;
-        $process_ids = array();
-
+        $execution_id = $timestamp . '_' . $plan_name;
         $test_manifest = array();
 
         // Relevant file paths
-        $test_report_file = Path::normalize( $test_directory . 'active_tests/report_' . $plan_name . '.json' );
-        $test_script_directory = Path::normalize( $test_directory . 'scripts' ); 
-        $test_result_directory = Path::normalize( $test_directory . 'results/' . $plan_name . '/' . $execution_id ); 
-        $test_report_file_archive = Path::normalize( $test_directory . 'archive/archive_' . $plan_name . '.json' );
+        $test_report_file = Path::normalize( $test_directory . 'reports/report_' . $execution_id . '.json' );
+        $test_script_directory = Path::normalize( $test_directory . 'scripts/' ); 
+        $test_result_directory = Path::normalize( $test_directory . 'results/' ); 
+        $test_config_file = $test_directory . 'active_tests/active_' . $plan_name . '.xml';
+        $test_config_file_archive = $test_directory . 'archive/active_' . $plan_name . '.xml';
 
         // Prevent the same test from running simultaneously
-        if( file_exists( $test_report_file ) ) {
-            throw new Exception( 'Test already running' );
+        if( file_exists( $test_config_file ) ) {
+            // throw new Exception( 'Test already running' );
         }
 
         // Verify that PHPUnit is installed
-        $phpunit_location = $env_config[ 'directories' ][ 'shared' ] . 'vendor/phpunit/phpunit/phpunit'; 
+        $phpunit_location = $env_config[ 'directories' ][ 'vendor' ] . 'phpunit/phpunit/phpunit'; 
         if( !file_exists( $phpunit_location ) ) {
             throw new Exception( 'PHPUnit not available' );
         }
@@ -384,7 +385,7 @@ class Test_plan {
             // Loop over test cases  
             foreach( $test_suite_data[ 'test_cases' ] as $case_key => $case_data ) {
 
-                $test_script = $test_script_directory . '/' . $case_data[ 'script_location' ];
+                $test_script = $test_script_directory . $case_data[ 'script_location' ];
 
                 if( file_exists( $test_script ) ) { 
                     
@@ -413,29 +414,71 @@ class Test_plan {
         // Publish report as semaphore to prevent other tests from running concurrently
         $this->report_summary[ 'test_results' ][ 'details' ][ 'execution_id' ] = $execution_id;
         $this->report_summary[ 'test_results' ][ 'details' ][ 'start_time' ] = $this->Env_config->get_datetime_now();
-        // $this->report_summary[ 'test_results' ][ 'details' ]
 
         $this->Filesystem->touch( $test_report_file );
         $this->Filesystem->appendToFile( $test_report_file, json_encode( $this->report_summary, JSON_PRETTY_PRINT ), true );
 
-        // Create folder to store test results
-        $this->Filesystem->mkdir( $test_result_directory );
+        // foreach( $test_manifest as $suite_key => $suite ) {
 
-        // Run tests - synchronously
+        //     foreach( $suite as $case_key => $case ) {
+
+        //         $process = new Process([ $phpunit_location, '--log-junit', $case[ 'results_file' ], $case[ 'test_script' ] ]);
+        //         $process->run();
+        //         // @todo Log errors to a stream or database
+
+        //         //throw new ProcessFailedException($process);
+
+        //     }
+
+        // }
+
+        $test_manifest_xml = array( 'testsuite' => array() );
+
+        // "Create" the document.
+        $xml = new DOMDocument( "1.0", "utf-8" );
+        $xml->formatOutput = true;
+        $xml->preserveWhiteSpace = false;
+        
+        $xml_phpunit = $xml->createElement( "phpunit" );
+        $xml_phpunit->setAttribute( "bootstrap", $env_config[ 'directories' ][ 'framework' ] . 'bootstrap/testing/bootstrap.php' );
+        $xml_phpunit->setAttribute( "xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance" );
+        $xml_phpunit->setAttribute( "xsi:noNamespaceSchemaLocation", "http://schema.phpunit.de/3.7/phpunit.xsd" );
+        
+
+        $xml_suites = $xml->createElement( "testsuites" );
+
         foreach( $test_manifest as $suite_key => $suite ) {
+            $xml_suite = $xml->createElement( "testsuite" );
+            $xml_suite->setAttribute( 'name', $suite_key );
 
-            foreach( $suite as $case_key => $case ) {
-
-                $process = new Process([ $phpunit_location, '--log-junit', $case[ 'results_file' ], $case[ 'test_script' ] ]);
-                $process->run();
-                // @todo Log errors to a stream or database
+            foreach( $suite as $file_key => $file ) {     
+        
+                $xml_file = $xml->createElement( "file", $file[ 'test_script' ] );
+                $xml_suite->appendChild( $xml_file );
 
             }
 
+            $xml_suites->appendchild( $xml_suite );
+           
         }
 
+        $xml_phpunit->appendChild( $xml_suites );
+        $xml->appendChild( $xml_phpunit );
+        $xml->save( $test_config_file );
+
+
+        Dump_var::print( $test_config_file );
+        Dump_var::print( $test_result_directory . $execution_id . '.xml' );
+        $test_results_file = $test_result_directory . $execution_id . '.xml'; 
+ 
+        $process = new Process([ $phpunit_location, '--log-junit', $test_results_file, '-c', $test_config_file ]);
+        $process->run();
+        // @todo Log errors to a stream or database
+
+        // throw new ProcessFailedException($process);
+
         // // When test is complete then move sempaphore to archive
-        // $this->Filesystem->rename( $test_report_file, $test_report_file_archive, true );
+        //$this->Filesystem->rename( $test_config_file, $test_config_file_archive, true );
 
         return $this->Response->get_response( array(
             'status' => 200,

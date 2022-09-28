@@ -18,7 +18,7 @@ if ( !defined( 'SHARED_LIBRARY_DIR' ) ) {
     define( 'SHARED_LIBRARY_DIR', __DIR__ . '/../shared' );
 }
 
-require_once( __DIR__ . '/../../vendor/autoload.php' );
+require_once( __DIR__ . '/../../../vendor/autoload.php' );
 require_once( __DIR__ . '/../../autoload.php' );
 
 /**

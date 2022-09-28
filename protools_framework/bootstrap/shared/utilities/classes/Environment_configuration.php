@@ -471,6 +471,9 @@ class Environment_configuration {
 
             $program_directories[ 'tests' ][ 'shared' ] = $search_directory . '/protools_framework/tests/';
             $program_directories[ 'shared' ] = $search_directory . '/protools_framework/bootstrap/shared/';
+            $program_directories[ 'root' ] = $search_directory;
+            $program_directories[ 'framework' ] = $search_directory . '/protools_framework/';
+            $program_directories[ 'vendor' ] = $search_directory . '/vendor/';
 
             $response = $this->Api_response->get_response( array(
                 'error'    => false,

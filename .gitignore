@@ -2,3 +2,7 @@
 data_sources.inc
 env_domains.inc
 vendor/
+tests/active_tests/
+tests/reports/
+tests/archive/
+tests/results/
