@@ -12,5 +12,6 @@ pipelines:
       name: Run Test
       script:
         - pwd 
-        - cd /protools_framework/bootstrap/testing/
+        - ll
+        - cd protools_framework/bootstrap/testing/
         - php index.php testing.prototypes.dv/testing
