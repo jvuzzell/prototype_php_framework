@@ -279,9 +279,7 @@ class Api_response {
         // Print JSON to screen
         fwrite( STDERR, self::encode_response( $response_data, __FUNCTION__ ) );
 
-        // No further processing
-        die();
-
+        return true;
     }
 
     /**

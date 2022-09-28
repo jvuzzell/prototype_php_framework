@@ -46,41 +46,27 @@ function universal_exception_handler( $exception ) {
  * Set Universal Error Handler
  */
 
-function universal_error_handler( $error = 0, $error_message = '', $error_file = '', $error_line = 0, $error_context = [] ) {
+function universal_error_handler( $severity, $message, $file, $line ) {
 
-    $response_code = 500;
-    $exception_response = array(
-        'error'   => TRUE, 
-        'status'  => $response_code,
-        'system'  => array(
-            'issue_id' => 'universal_exception_handler_002', 
-            'log'      => TRUE, 
-            'private'  => TRUE, 
-            'continue' => FALSE
-        ),
-        'source'  => 'universal_error_handler',
-        'message' => $error_message,
-        'data'  => array(
-            'exception' => array( 
-                'message' => $error_message, 
-                'code' => $error, 
-                'file' => $error_file, 
-                'line' => $error_line
-            )
-        )
-    );
+    universal_exception_handler( new ErrorException($message, 0, $severity, $file, $line) );
 
-    if ( !defined( 'IS_CLI' ) || ( !defined( 'ENV' ) ) ) {
-        Api_response::print_stderr( 404, $exception_response, 'dev' ); // Assume we're not in a safe space, so be quiet
-    }
-
-    if( IS_CLI ) {
-        Api_response::print_stderr( 404, $exception_response, ENV_NAME );
-    } else {
-        Api_response::route_to_custom_page( 404, $exception_response, ERROR_PAGE, ENV_NAME ); 
-    } 
-    
 }
 
-set_error_handler( 'universal_error_handler', E_ALL );
+/**
+* Checks for a fatal error, work around for set_error_handler not working on fatal errors.
+*/
+function check_for_fatal() {
+
+    $error = error_get_last();
+
+    if ( isset( $error["type"] ) && $error["type"] == E_ERROR ) {
+        log_error( $error["type"], $error["message"], $error["file"], $error["line"] );
+    }
+
+}
+
+register_shutdown_function( "check_for_fatal" );
+set_error_handler( 'universal_error_handler' );
 set_exception_handler( 'universal_exception_handler' );
+ini_set( "display_errors", "off" );
+error_reporting( E_ALL );
