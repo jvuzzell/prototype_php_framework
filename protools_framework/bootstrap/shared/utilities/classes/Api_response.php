@@ -268,6 +268,23 @@ class Api_response {
     }
 
     /**
+     * Print Stderr
+     */
+
+    Public static function print_stderr( int $response_code, array $response_data, string $environment = 'prod' ) {
+
+        // Add defaults for Standardized API Response
+        $response_data = self::set_response( $response_data, $environment );
+
+        // Print JSON to screen
+        fwrite( self::encode_response( $response_data, __FUNCTION__ ) );
+
+        // No further processing
+        die();
+
+    }
+
+    /**
      * Alias for print_json_to_screen
      */
 
