@@ -31,11 +31,11 @@ function universal_exception_handler( $exception ) {
     );
 
     if ( ! defined( 'IS_CLI' ) ) {
-        Api_response::print_stderr( 404, $exception_response, 'dev' );
+        Api_response::print_json( 404, $exception_response, 'dev' );
     }
     
     if( IS_CLI ) {
-        Api_response::print_stderr( 404, $exception_response, ENV_NAME );
+        Api_response::print_json( 404, $exception_response, ENV_NAME );
     } else {
         Api_response::route_to_custom_page( 404, $exception_response, ERROR_PAGE, ENV_NAME ); 
     } 
@@ -71,11 +71,11 @@ function universal_error_handler( $error = 0, $error_message = '', $error_file =
     );
 
     if ( !defined( 'IS_CLI' ) || ( !defined( 'ENV' ) ) ) {
-        Api_response::print_stderr( 404, $exception_response, 'dev' ); // Assume we're not in a safe space, so be quiet
+        Api_response::print_json( 404, $exception_response, 'dev' ); // Assume we're not in a safe space, so be quiet
     }
 
     if( IS_CLI ) {
-        Api_response::print_stderr( 404, $exception_response, ENV_NAME );
+        Api_response::print_json( 404, $exception_response, ENV_NAME );
     } else {
         Api_response::route_to_custom_page( 404, $exception_response, ERROR_PAGE, ENV_NAME ); 
     } 
