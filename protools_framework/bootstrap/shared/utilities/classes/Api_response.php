@@ -277,7 +277,7 @@ class Api_response {
         $response_data = self::set_response( $response_data, $environment );
 
         // Print JSON to screen
-        fwrite( self::encode_response( $response_data, __FUNCTION__ ) );
+        fwrite( STDERR, self::encode_response( $response_data, __FUNCTION__ ) );
 
         // No further processing
         die();
