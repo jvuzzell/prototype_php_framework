@@ -7,3 +7,8 @@ pipelines:
           - apt-get update && apt-get install -y unzip
           - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
           - composer install
+   - step:
+      script:
+        - pwd 
+        - cd /protools_framework/bootstrap/testing/
+        - php index.php testing.prototypes.dv/testing
