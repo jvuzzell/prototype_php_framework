@@ -5,4 +5,4 @@ vendor/
 tests/active_tests/
 tests/reports/*
 tests/archive/*
-tests/results/*
+tests/results/*.xml
