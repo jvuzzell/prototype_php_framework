@@ -45,13 +45,12 @@ class Test_plan {
         'test_results' => array(
             'details' => array(
                 'execution_id' => '', 
-                'process_id' => '',
                 'start_time' => '', 
+                'end_time' => '',
                 'stats' => array(
-                    'total_duration' => '00:00:00', 
-                    'total' => 0, 
-                    'remaining' => 0, 
-                    'complete' => 0
+                    'total_duration_seconds' => '0.0000',
+                    'test_suite_total' => 0,  
+                    'test_script_total' => 0
                 )
             )
         ),
@@ -365,8 +364,8 @@ class Test_plan {
         $test_report_file = Path::normalize( $test_directory . 'reports/report_' . $execution_id . '.json' );
         $test_script_directory = Path::normalize( $test_directory . 'scripts/' ); 
         $test_result_directory = Path::normalize( $test_directory . 'test-results/' ); 
-        $test_config_file = $test_directory . 'active_tests/active_' . $plan_name . '.xml';
-        $test_config_file_archive = $test_directory . 'archive/active_' . $plan_name . '.xml';
+        $test_config_file = $test_directory . 'active_tests/active_' . $execution_id . '.xml';
+        $test_config_file_archive = $test_directory . 'archive/archived_' . $execution_id . '.xml';
 
         // Prevent the same test from running simultaneously
         if( file_exists( $test_config_file ) ) {
@@ -381,29 +380,31 @@ class Test_plan {
 
         // Compile cases for testing and reporting
         foreach( $this->report_summary[ 'test_suites' ] as $suite_key => $test_suite_data ) {
-             
+            
+            $this->report_summary[ 'test_results' ][ 'details' ][ 'stats' ][ 'test_suite_total' ]++; 
+            
             // Loop over test cases  
-            foreach( $test_suite_data[ 'test_cases' ] as $case_key => $case_data ) {
+            foreach( $test_suite_data[ 'test_scripts' ] as $script_key => $script_data ) {
 
-                $test_script = $test_script_directory . $case_data[ 'script_location' ];
+                $test_script = $test_script_directory . $script_data[ 'script_location' ];
 
                 if( file_exists( $test_script ) ) { 
                     
                     // Create file for storing results of test case
-                    $test_results_file = $test_result_directory . '/' . $case_key . '.xml'; 
+                    $test_results_file = $test_result_directory . '/' . $script_key . '.xml'; 
 
-                    $test_manifest[ $suite_key ][ $case_key ] = array(
+                    $test_manifest[ $suite_key ][ $script_key ] = array(
                         'test_script' => $test_script, 
                         'results_file' => $test_results_file,
                         'finished' => false
                     );
 
-                    $this->report_summary[ 'test_suites' ][ $suite_key ][ 'test_cases' ][ $case_key ][ 'script_location' ] = $test_script;
-                    $this->report_summary[ 'test_suites' ][ $suite_key ][ 'test_cases' ][ $case_key ][ 'results_location' ] = $test_results_file;
+                    $this->report_summary[ 'test_suites' ][ $suite_key ][ 'test_scripts' ][ $script_key ][ 'script_location' ] = $test_script;
+                    $this->report_summary[ 'test_results' ][ 'details' ][ 'stats' ][ 'test_script_total' ]++; 
                     
                 } else {
                     
-                    throw new Exception( 'Test case not found; Suite - ' . $suite_key . ', case - ' . $case_key );
+                    throw new Exception( 'Test case not found; Suite - ' . $suite_key . ', case - ' . $script_key );
 
                 }
 
@@ -413,10 +414,8 @@ class Test_plan {
 
         // Publish report as semaphore to prevent other tests from running concurrently
         $this->report_summary[ 'test_results' ][ 'details' ][ 'execution_id' ] = $execution_id;
-        $this->report_summary[ 'test_results' ][ 'details' ][ 'start_time' ] = $this->Env_config->get_datetime_now();
-
-        $this->Filesystem->touch( $test_report_file );
-        $this->Filesystem->appendToFile( $test_report_file, json_encode( $this->report_summary, JSON_PRETTY_PRINT ), true );
+        $this->report_summary[ 'test_results' ][ 'details' ][ 'start_time' ] = $this->Env_config->get_datetime_now( 'Y-m-d h:m:s.u' );
+        $start_time_microseconds = microtime(true);
 
         // foreach( $test_manifest as $suite_key => $suite ) {
 
@@ -466,25 +465,32 @@ class Test_plan {
         $xml->appendChild( $xml_phpunit );
         $xml->save( $test_config_file );
 
-
-        Dump_var::print( $test_config_file );
-        Dump_var::print( $test_result_directory . $execution_id . '.xml' );
         $test_results_file = $test_result_directory . $execution_id . '.xml'; 
  
         $process = new Process([ $phpunit_location, '--log-junit', $test_results_file, '-c', $test_config_file ]);
         $process->run();
+
         // @todo Log errors to a stream or database
 
         // throw new ProcessFailedException($process);
 
-        // // When test is complete then move sempaphore to archive
-        //$this->Filesystem->rename( $test_config_file, $test_config_file_archive, true );
+        $end_time_microseconds = microtime(true);
+
+        $total_time_lapsed_seconds = ( ( ( $end_time_microseconds - $start_time_microseconds ) * 1000 ) / 1000 ); // Convert microseconds > milliseconds > seconds
+        $this->report_summary[ 'test_results' ][ 'details' ][ 'stats' ][ 'total_duration_seconds' ] =  $total_time_lapsed_seconds;  
+        $this->report_summary[ 'test_results' ][ 'details' ][ 'end_time' ] = $this->Env_config->get_datetime_now( 'Y-m-d h:m:s.u' );
+
+        $this->Filesystem->touch( $test_report_file );
+        $this->Filesystem->appendToFile( $test_report_file, json_encode( $this->report_summary, JSON_PRETTY_PRINT ), true );
+
+        // When test is complete then move sempaphore to archive
+        $this->Filesystem->rename( $test_config_file, $test_config_file_archive, true );
 
         return $this->Response->get_response( array(
             'status' => 200,
             'error' => false,  
             'issue_id' => 'test_plan_015', 
-            'message' => 'Test plan ran succesfully', 
+            'message' => 'Test plan ran successfully', 
             'source' => get_class(), 
             'data' => array(
                 'test_report_file' => $test_report_file 
@@ -492,20 +498,5 @@ class Test_plan {
         ));
 
     }
-
-    Public function compile_report( string $report_file ) : array {
-
-        // Open report 
-
-        // Tally completed tests based
-
-        // Read test results into a manifest 
-
-        // Tally total running time 
-
-        // 
-
-    }
-
 
 }
