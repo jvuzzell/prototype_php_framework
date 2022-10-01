@@ -10,5 +10,6 @@ pipelines:
         - composer install
         - pwd 
         - ls
+        - git clone git@bitbucket.org:jvuzzell/environment_config.git environment_variables
         - cd protools_framework/bootstrap/testing/
         - php index.php testing.prototypes.dv/testing
