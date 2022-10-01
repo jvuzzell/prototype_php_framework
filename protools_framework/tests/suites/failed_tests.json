@@ -3,6 +3,7 @@
     "description" : "Test multiple scenarios regarding the base ProTools Framework",
     "test_scripts" : {
         "UserFailedTests" : {
+            "test_type" : "unit",
             "description" : "Evaluates failed user test",
             "script_location" : "Zubair/UserFailedTests.php"
         }

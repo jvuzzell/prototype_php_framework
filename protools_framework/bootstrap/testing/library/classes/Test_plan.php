@@ -41,10 +41,12 @@ class Test_plan {
         'error' => false, 
         'message' => 'Test plan initailized'
     ); 
+
     Private $report_summary = array(
         'test_results' => array(
             'details' => array(
                 'execution_id' => '', 
+                'results_file' => '',
                 'start_time' => '', 
                 'end_time' => '',
                 'stats' => array(
@@ -127,7 +129,7 @@ class Test_plan {
 
     Private function get_branch() : array {
 
-        // Find the current branch
+        // Get the current branch name
         $branch_response = shell_exec('git branch -v --no-abbrev');
 
         if (is_string( $branch_response ) && 1 === preg_match('{^\* (.+?)\s+([a-f0-9]{40})(?:\s|$)}m', $branch_response, $matches)) { 
@@ -135,7 +137,7 @@ class Test_plan {
             $branch_data = explode( " ", $branch );
         } 
         
-        // Remote repository
+        // Get remote repository name
         $remote_repo_response = shell_exec('git remote -v'); 
         $remote_data = explode( "	", $remote_repo_response );
         $remote = str_replace( " (fetch)", "", $remote_data[ 1 ] ); 
@@ -417,23 +419,9 @@ class Test_plan {
         $this->report_summary[ 'test_results' ][ 'details' ][ 'start_time' ] = $this->Env_config->get_datetime_now( 'Y-m-d h:m:s.u' );
         $start_time_microseconds = microtime(true);
 
-        // foreach( $test_manifest as $suite_key => $suite ) {
-
-        //     foreach( $suite as $case_key => $case ) {
-
-        //         $process = new Process([ $phpunit_location, '--log-junit', $case[ 'results_file' ], $case[ 'test_script' ] ]);
-        //         $process->run();
-        //         // @todo Log errors to a stream or database
-
-        //         //throw new ProcessFailedException($process);
-
-        //     }
-
-        // }
-
         $test_manifest_xml = array( 'testsuite' => array() );
 
-        // "Create" the document.
+        // Compile PHPUnit Config File
         $xml = new DOMDocument( "1.0", "utf-8" );
         $xml->formatOutput = true;
         $xml->preserveWhiteSpace = false;
@@ -451,7 +439,9 @@ class Test_plan {
             $xml_suite->setAttribute( 'name', $suite_key );
 
             foreach( $suite as $file_key => $file ) {     
-        
+                
+                // @todo check to see if file is a directory
+                // $xml_file = $xml->createElement( "directory", $file[ 'test_script' ] );
                 $xml_file = $xml->createElement( "file", $file[ 'test_script' ] );
                 $xml_suite->appendChild( $xml_file );
 
@@ -467,6 +457,7 @@ class Test_plan {
 
         $test_results_file = $test_result_directory . $execution_id . '.xml'; 
  
+        // Run PHPUnit
         $process = new Process([ $phpunit_location, '--log-junit', $test_results_file, '-c', $test_config_file ]);
         $process->run();
 
@@ -474,11 +465,12 @@ class Test_plan {
 
         // throw new ProcessFailedException($process);
 
+        // Complete reports
         $end_time_microseconds = microtime(true);
-
         $total_time_lapsed_seconds = ( ( ( $end_time_microseconds - $start_time_microseconds ) * 1000 ) / 1000 ); // Convert microseconds > milliseconds > seconds
         $this->report_summary[ 'test_results' ][ 'details' ][ 'stats' ][ 'total_duration_seconds' ] =  $total_time_lapsed_seconds;  
         $this->report_summary[ 'test_results' ][ 'details' ][ 'end_time' ] = $this->Env_config->get_datetime_now( 'Y-m-d h:m:s.u' );
+        $this->report_summary[ 'test_results' ][ 'details' ][ 'results_file' ] = $test_results_file;
 
         $this->Filesystem->touch( $test_report_file );
         $this->Filesystem->appendToFile( $test_report_file, json_encode( $this->report_summary, JSON_PRETTY_PRINT ), true );

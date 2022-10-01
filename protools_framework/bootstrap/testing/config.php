@@ -62,7 +62,6 @@ $Api_response = new Api_response();
  */
 
 $env_args = array(
-
     'site_directory' => __DIR__,
     'encryption_key' => ENCRYPT_KEY,
     'encryption_nonce' => ENCRYPT_NONCE,

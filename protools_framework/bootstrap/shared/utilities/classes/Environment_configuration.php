@@ -495,7 +495,7 @@ class Environment_configuration {
     Private function get_env_var_path( $domain ) : array {
 
         $response = array();
-
+        Dump_var::print( $domain );
         $matching_search_response = $this->Directory_search->search( 
             array( 'environment_variables/' ), 
             array( 'search_direction' => 'parent' ) 
