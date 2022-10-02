@@ -369,9 +369,12 @@ class Test_plan {
         $test_config_file = $test_directory . 'active_tests/active_' . $execution_id . '.xml';
         $test_config_file_archive = $test_directory . 'archive/archived_' . $execution_id . '.xml';
 
+        $test_config_file = $test_directory . 'active_tests/debug_test.xml';
+        Dump_var::print( $test_config_file );
+
         // Prevent the same test from running simultaneously
         if( file_exists( $test_config_file ) ) {
-            // throw new Exception( 'Test already running' );
+            throw new Exception( 'Test already running' );
         }
 
         // Verify that PHPUnit is installed
