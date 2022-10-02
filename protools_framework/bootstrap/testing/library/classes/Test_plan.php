@@ -12,6 +12,7 @@ use Bootstrap\Shared\Utilities\Classes\Json_validator as Json_validator;
 use Bootstrap\Shared\Utilities\Classes\Api_response as Api_response;
 
 use \Exception;
+use \ErrorException;
 use \Dump_var;
 use \XMLWriter;
 use \DOMDocument;
@@ -377,7 +378,7 @@ class Test_plan {
         // Verify that PHPUnit is installed
         $phpunit_location = $env_config[ 'directories' ][ 'vendor' ] . 'phpunit/phpunit/phpunit'; 
         if( !file_exists( $phpunit_location ) ) {
-            throw new Exception( 'PHPUnit not available' );
+            throw new ErrorException( 'PHPUnit not available' );
         }
 
         // Compile cases for testing and reporting
@@ -406,7 +407,7 @@ class Test_plan {
                     
                 } else {
                     
-                    throw new Exception( 'Test case not found; Suite - ' . $suite_key . ', case - ' . $script_key );
+                    throw new ErrorException( 'Test case not found; Suite - ' . $suite_key . ', case - ' . $script_key );
 
                 }
 
