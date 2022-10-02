@@ -454,7 +454,7 @@ class Test_plan {
         $xml->appendChild( $xml_phpunit );
         $xml->save( $test_config_file );
 
-        $test_results_file = $test_result_directory . $execution_id . '.xml'; 
+        $test_results_file = $test_result_directory . 'debug_test.xml'; 
  
         // Run PHPUnit
         $process = new Process([ $phpunit_location, '--log-junit', $test_results_file, '-c', $test_config_file ]);
