@@ -372,7 +372,7 @@ class Test_plan {
 
         // Prevent the same test from running simultaneously
         if( file_exists( $test_config_file ) ) {
-            // throw new Exception( 'Test already running' );
+            // throw new ErrorException( 'Test already running' );
         }
 
         // Verify that PHPUnit is installed
@@ -390,7 +390,7 @@ class Test_plan {
             foreach( $test_suite_data[ 'test_scripts' ] as $script_key => $script_data ) {
 
                 $test_script = $test_script_directory . $script_data[ 'script_location' ];
-
+                Dump_var::print( $test_script );
                 if( file_exists( $test_script ) ) { 
                     
                     // Create file for storing results of test case
@@ -404,7 +404,7 @@ class Test_plan {
 
                     $this->report_summary[ 'test_suites' ][ $suite_key ][ 'test_scripts' ][ $script_key ][ 'script_location' ] = $test_script;
                     $this->report_summary[ 'test_results' ][ 'details' ][ 'stats' ][ 'test_script_total' ]++; 
-                    
+
                 } else {
                     
                     throw new ErrorException( 'Test case not found; Suite - ' . $suite_key . ', case - ' . $script_key );
