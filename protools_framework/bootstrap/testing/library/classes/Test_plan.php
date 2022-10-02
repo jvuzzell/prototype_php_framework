@@ -370,7 +370,6 @@ class Test_plan {
         $test_config_file_archive = $test_directory . 'archive/archived_' . $execution_id . '.xml';
 
         $test_config_file_archive = $test_directory . 'archive/archived_debug_test.xml';
-        Dump_var::print( $test_config_file_archive );
 
         // Prevent the same test from running simultaneously
         if( file_exists( $test_config_file ) ) {
@@ -465,7 +464,7 @@ class Test_plan {
 
         // @todo Log errors to a stream or database
 
-        throw new ProcessFailedException($process);
+        // throw new ProcessFailedException($process);
 
         // Complete reports
         $end_time_microseconds = microtime(true);
