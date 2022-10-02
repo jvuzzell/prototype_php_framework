@@ -17,7 +17,6 @@ function protools_specific_autoloader($className) {
     $fileName .= $className . '.php';
     $fullFileName = $includePath . DIRECTORY_SEPARATOR . $fileName;
 
-    // var_dump( $fullFileName );
     if (file_exists($fullFileName)) {
         require $fullFileName;
     }

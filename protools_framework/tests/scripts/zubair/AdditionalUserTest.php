@@ -4,7 +4,7 @@ namespace Tests\Scripts\Zubair;
 
 use PHPUnit\Framework\TestCase;
 
-final class UserFailedTests extends TestCase
+final class AdditionalUserTest extends TestCase
 {
     public function testClassConstructor()
     {

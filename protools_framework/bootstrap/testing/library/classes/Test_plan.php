@@ -372,13 +372,13 @@ class Test_plan {
 
         // Prevent the same test from running simultaneously
         if( file_exists( $test_config_file ) ) {
-            // throw new ErrorException( 'Test already running' );
+            throw new Exception( 'Test already running' );
         }
 
         // Verify that PHPUnit is installed
         $phpunit_location = $env_config[ 'directories' ][ 'vendor' ] . 'phpunit/phpunit/phpunit'; 
         if( !file_exists( $phpunit_location ) ) {
-            throw new ErrorException( 'PHPUnit not available' );
+            throw new Exception( 'PHPUnit not available' );
         }
 
         // Compile cases for testing and reporting
@@ -390,7 +390,7 @@ class Test_plan {
             foreach( $test_suite_data[ 'test_scripts' ] as $script_key => $script_data ) {
 
                 $test_script = $test_script_directory . $script_data[ 'script_location' ];
-                Dump_var::print( $test_script );
+
                 if( file_exists( $test_script ) ) { 
                     
                     // Create file for storing results of test case
@@ -407,7 +407,7 @@ class Test_plan {
 
                 } else {
                     
-                    throw new ErrorException( 'Test case not found; Suite - ' . $suite_key . ', case - ' . $script_key );
+                    throw new Exception( 'Test case not found; Suite - ' . $suite_key . ', case - ' . $script_key );
 
                 }
 
