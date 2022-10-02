@@ -431,7 +431,6 @@ class Test_plan {
         $xml_phpunit->setAttribute( "xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance" );
         $xml_phpunit->setAttribute( "xsi:noNamespaceSchemaLocation", "http://schema.phpunit.de/3.7/phpunit.xsd" );
         
-
         $xml_suites = $xml->createElement( "testsuites" );
 
         foreach( $test_manifest as $suite_key => $suite ) {
