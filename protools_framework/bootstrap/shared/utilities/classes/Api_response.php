@@ -27,10 +27,6 @@ namespace Bootstrap\Shared\Utilities\Classes;
  */
 
 class Api_response {
-    
-    Public function set_logger() {
-        
-    }
 
     /**
      * Set HTTP Response Code 
