@@ -18,3 +18,4 @@ pipelines:
         - php index.php testing.prototypes.dv/testing
         - cat /opt/atlassian/pipelines/agent/build/protools_framework/tests/test-results/debug_test.xml
         - cat /opt/atlassian/pipelines/agent/build/protools_framework/tests/archive/archived_debug_test.xml
+        - cat /opt/atlassian/pipelines/agent/build/protools_framework/bootstrap/testing/bootstrap.php
