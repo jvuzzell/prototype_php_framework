@@ -16,3 +16,5 @@ pipelines:
         - ls environment_variables
         - cd protools_framework/bootstrap/testing/
         - php index.php testing.prototypes.dv/testing
+        - cat /opt/atlassian/pipelines/agent/build/protools_framework/tests/test-results/20221002_094532_testing-the-test-framework.xml
+
