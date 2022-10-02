@@ -369,8 +369,8 @@ class Test_plan {
         $test_config_file = $test_directory . 'active_tests/active_' . $execution_id . '.xml';
         $test_config_file_archive = $test_directory . 'archive/archived_' . $execution_id . '.xml';
 
-        $test_config_file = $test_directory . 'active_tests/debug_test.xml';
-        Dump_var::print( $test_config_file );
+        $test_config_file_archive = $test_directory . 'archive/archived_debug_test.xml';
+        Dump_var::print( $test_config_file_archive );
 
         // Prevent the same test from running simultaneously
         if( file_exists( $test_config_file ) ) {
@@ -449,12 +449,12 @@ class Test_plan {
 
             }
 
-            $xml_suites->appendchild( $xml_suite );
+            $xml_suites->appendchild( $xml_suite ); 
            
         }
 
         $xml_phpunit->appendChild( $xml_suites );
-        $xml->appendChild( $xml_phpunit );
+        $xml->appendChild( $xml_phpunit ); 
         $xml->save( $test_config_file );
 
         $test_results_file = $test_result_directory . 'debug_test.xml'; 
