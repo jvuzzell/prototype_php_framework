@@ -17,3 +17,4 @@ pipelines:
         - cd protools_framework/bootstrap/testing/
         - php index.php testing.prototypes.dv/testing
         - cat /opt/atlassian/pipelines/agent/build/protools_framework/tests/test-results/debug_test.xml
+        - cat /opt/atlassian/pipelines/agent/build/protools_framework/tests/active_tests/debug_test.xml
