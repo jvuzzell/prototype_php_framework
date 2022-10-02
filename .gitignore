@@ -7,3 +7,5 @@ tests/reports/*
 tests/archive/*
 tests/results/*
 tests/test-results/*
+.phpunit.result.cache
+environment_variables/
