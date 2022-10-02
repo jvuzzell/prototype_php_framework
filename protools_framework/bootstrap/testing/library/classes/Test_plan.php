@@ -369,11 +369,9 @@ class Test_plan {
         $test_config_file = $test_directory . 'active_tests/active_' . $execution_id . '.xml';
         $test_config_file_archive = $test_directory . 'archive/archived_' . $execution_id . '.xml';
 
-        $test_config_file_archive = $test_directory . 'archive/archived_debug_test.xml';
-
         // Prevent the same test from running simultaneously
         if( file_exists( $test_config_file ) ) {
-            throw new Exception( 'Test already running' );
+            // throw new Exception( 'Test already running' );
         }
 
         // Verify that PHPUnit is installed
@@ -427,12 +425,13 @@ class Test_plan {
         $xml = new DOMDocument( "1.0", "utf-8" );
         $xml->formatOutput = true;
         $xml->preserveWhiteSpace = false;
-
+        
         $xml_phpunit = $xml->createElement( "phpunit" );
         $xml_phpunit->setAttribute( "bootstrap", $env_config[ 'directories' ][ 'framework' ] . 'bootstrap/testing/bootstrap.php' );
         $xml_phpunit->setAttribute( "xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance" );
         $xml_phpunit->setAttribute( "xsi:noNamespaceSchemaLocation", "http://schema.phpunit.de/3.7/phpunit.xsd" );
         
+
         $xml_suites = $xml->createElement( "testsuites" );
 
         foreach( $test_manifest as $suite_key => $suite ) {
@@ -448,15 +447,15 @@ class Test_plan {
 
             }
 
-            $xml_suites->appendchild( $xml_suite ); 
+            $xml_suites->appendchild( $xml_suite );
            
         }
 
         $xml_phpunit->appendChild( $xml_suites );
-        $xml->appendChild( $xml_phpunit ); 
+        $xml->appendChild( $xml_phpunit );
         $xml->save( $test_config_file );
 
-        $test_results_file = $test_result_directory . 'debug_test.xml'; 
+        $test_results_file = $test_result_directory . $execution_id . '.xml'; 
  
         // Run PHPUnit
         $process = new Process([ $phpunit_location, '--log-junit', $test_results_file, '-c', $test_config_file ]);
