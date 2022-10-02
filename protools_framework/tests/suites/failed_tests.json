@@ -5,7 +5,7 @@
         "UserFailedTests" : {
             "test_type" : "unit",
             "description" : "Evaluates failed user test",
-            "script_location" : "Zubair/UserFailedTests.php"
+            "script_location" : "zubair/UserFailedTests.php"
         }
     }
 }

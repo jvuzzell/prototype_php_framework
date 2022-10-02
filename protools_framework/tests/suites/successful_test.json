@@ -5,7 +5,7 @@
         "UserTests" : {
             "test_type" : "unit",
             "description" : "Evaluates Successful user tests",
-            "script_location" : "Zubair/UserTest.php"
+            "script_location" : "zubair/UserTest.php"
         }
     }
 }
