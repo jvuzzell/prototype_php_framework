@@ -425,14 +425,12 @@ class Test_plan {
         $xml = new DOMDocument( "1.0", "utf-8" );
         $xml->formatOutput = true;
         $xml->preserveWhiteSpace = false;
-        Dump_var::print( $env_config[ 'directories' ][ 'framework' ] . 'bootstrap/testing/bootstrap.php'  );
-        Dump_var::print( file_exists( $env_config[ 'directories' ][ 'framework' ] . 'bootstrap/testing/bootstrap.php'  ) );
+
         $xml_phpunit = $xml->createElement( "phpunit" );
         $xml_phpunit->setAttribute( "bootstrap", $env_config[ 'directories' ][ 'framework' ] . 'bootstrap/testing/bootstrap.php' );
         $xml_phpunit->setAttribute( "xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance" );
         $xml_phpunit->setAttribute( "xsi:noNamespaceSchemaLocation", "http://schema.phpunit.de/3.7/phpunit.xsd" );
         
-
         $xml_suites = $xml->createElement( "testsuites" );
 
         foreach( $test_manifest as $suite_key => $suite ) {
