@@ -465,7 +465,7 @@ class Test_plan {
 
         // @todo Log errors to a stream or database
 
-        // throw new ProcessFailedException($process);
+        throw new ProcessFailedException($process);
 
         // Complete reports
         $end_time_microseconds = microtime(true);
