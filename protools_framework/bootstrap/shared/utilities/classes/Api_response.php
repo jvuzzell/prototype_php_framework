@@ -15,12 +15,13 @@ namespace Bootstrap\Shared\Utilities\Classes;
  * 
  *  @method set_http_response_code
  *  @method set_response
+ *  @method response_helper
  * 
  * Public Methods
  * 
  *  @method print_json_to_screen
- *  @method close_program
  *  @method route_to_custom_page
+ *  @method print_stderr 
  *  @method get_response
  * 
  */
@@ -127,21 +128,9 @@ class Api_response {
 
         // @todo In the future if an API response is private, we need to make sure 
         //       that it is logged/emailed with all attributes
-        if( 
-            $args[ 'system' ][ 'private' ] === false && strtolower( $environment ) !== 'prod'
-        ) {
+        if( $args[ 'system' ][ 'private' ] === false ) {
 
             $api_response = $args;
-
-        } else if( $args[ 'system' ][ 'private' ] === true && strtolower( $environment ) == 'dev' ) {
-
-            $api_response = array( 
-                'status'  => $args[ 'status' ],
-                'error'   => $args[ 'error' ],
-                'message' => $args[ 'message' ], 
-                'source'  => $args[ 'source' ], 
-                'data'    => $args[ 'data' ]
-            );
 
         } else {
 

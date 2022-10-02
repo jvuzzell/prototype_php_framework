@@ -27,14 +27,6 @@ $Test_plan = new Test_plan(
     new Filesystem
 );
 
-$test_response = $Test_plan->run_tests();
-
-// if( $test_response[ 'error' ] ) {
-//     Api_response::print_json( $test_response );
-// } else { 
-//     $Test_plan->compile_report( $test_response[ 'data' ][ 'test_report_file' ] );
-// }
-
-// Dump_var::print( $Test_plan->get_plan_summary()[ 'data' ] );
-
-Dump_var::print( $Test_plan->get_test_report() );
+$report = $Test_plan->get_test_report(); 
+$report[ 'system' ][ 'private' ] = false;
+Api_response::print_json( $report[ 'status' ], $report, 'prod' );
