@@ -2,7 +2,6 @@
 
 namespace Tests\Scripts\Zubair;
 
-use Tests\Scripts\Zubair\User;
 use PHPUnit\Framework\TestCase;
 
 final class UserTest extends TestCase
