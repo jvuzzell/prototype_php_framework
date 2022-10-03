@@ -11,8 +11,5 @@ pipelines:
         - apt-get --assume-yes install git-core
         - git --version
         - git clone git@bitbucket.org:jvuzzell/environment_config.git environment_variables
-        - pwd 
-        - ls
-        - ls environment_variables
         - cd protools_framework/bootstrap/testing/
         - php index.php testing.prototypes.dv/testing
