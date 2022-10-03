@@ -45,6 +45,7 @@ class Test_plan {
 
     Private $report_summary = array(
         'test_results' => array(
+            'build_passed' => false,
             'details' => array(
                 'execution_id' => '', 
                 'results_file' => '',
@@ -53,7 +54,13 @@ class Test_plan {
                 'stats' => array(
                     'total_duration_seconds' => '0.0000',
                     'test_suite_total' => 0,  
-                    'test_script_total' => 0
+                    'test_script_total' => 0,
+                    'test_count' => 0, 
+                    'assertions' => 0, 
+                    'errors' => 0, 
+                    'warnings' => 0,
+                    'failures' => 0, 
+                    'skipped' => 0
                 )
             )
         ),
@@ -464,15 +471,31 @@ class Test_plan {
         $process->run();
 
         // @todo Log errors to a stream or database
-
         // throw new ProcessFailedException($process);
 
-        // Complete reports
-        $end_time_microseconds = microtime(true);
-        $total_time_lapsed_seconds = ( ( ( $end_time_microseconds - $start_time_microseconds ) * 1000 ) / 1000 ); // Convert microseconds > milliseconds > seconds
-        $this->report_summary[ 'test_results' ][ 'details' ][ 'stats' ][ 'total_duration_seconds' ] =  $total_time_lapsed_seconds;  
+        // $end_time_microseconds = microtime(true);
+        // $total_time_lapsed_seconds = ( ( ( $end_time_microseconds - $start_time_microseconds ) * 1000 ) / 1000 ); // Convert microseconds > milliseconds > seconds
+        // $this->report_summary[ 'test_results' ][ 'details' ][ 'stats' ][ 'total_duration_seconds' ] =  $total_time_lapsed_seconds; 
+
+        // Read test result XML
+        $test_results_xml = simplexml_load_file( $test_results_file );
+        $failed_tests = (int) $test_results_xml->testsuite->attributes()->failures; 
+
         $this->report_summary[ 'test_results' ][ 'details' ][ 'end_time' ] = $this->Env_config->get_datetime_now( 'Y-m-d h:m:s.u' );
         $this->report_summary[ 'test_results' ][ 'details' ][ 'results_file' ] = $test_results_file;
+        $this->report_summary[ 'test_results' ][ 'details' ][ 'stats' ][ 'total_duration_seconds' ] = (float) $test_results_xml->testsuite->attributes()->time; 
+        $this->report_summary[ 'test_results' ][ 'details' ][ 'stats' ][ 'test_count' ] = (int) $test_results_xml->testsuite->attributes()->tests; 
+        $this->report_summary[ 'test_results' ][ 'details' ][ 'stats' ][ 'assertions' ] = (int) $test_results_xml->testsuite->attributes()->assertions; 
+        $this->report_summary[ 'test_results' ][ 'details' ][ 'stats' ][ 'errors' ] = (int) $test_results_xml->testsuite->attributes()->errors;
+        $this->report_summary[ 'test_results' ][ 'details' ][ 'stats' ][ 'warnings' ] = (int) $test_results_xml->testsuite->attributes()->warnings;
+        $this->report_summary[ 'test_results' ][ 'details' ][ 'stats' ][ 'failures' ] = $failed_tests;
+        $this->report_summary[ 'test_results' ][ 'details' ][ 'stats' ][ 'skipped' ] = (int) $test_results_xml->testsuite->attributes()->skipped;
+                
+        if( $failed_tests === 0 ) {
+
+            $this->report_summary[ 'test_results' ][ 'build_passed' ] = true;
+
+        }
 
         $this->Filesystem->touch( $test_report_file );
         $this->Filesystem->appendToFile( $test_report_file, json_encode( $this->report_summary, JSON_PRETTY_PRINT ), true );
