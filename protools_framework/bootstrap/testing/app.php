@@ -10,15 +10,7 @@ use Bootstrap\Shared\Utilities\Classes\Json_validator as Json_validator;
 use Bootstrap\Shared\Utilities\Classes\Api_response as Api_response;
 
 use Bootstrap\Testing\Library\Classes\Test_plan as Test_plan;
-
-/**
- * @TODO
- * 1. Route request to test plan
- * 2. Publish Test Plan Results to client 
- * 3. Commit Test Plan Summary to DB
- * 4. Add meta to complete context of test plan execution
- * 
- */
+use \Dump_var as Dump_var;
 
 $Test_plan = new Test_plan( 
     $Environment_config,
@@ -27,6 +19,6 @@ $Test_plan = new Test_plan(
     new Filesystem
 );
 
+$Test_plan->run_tests();
 $report = $Test_plan->get_test_report(); 
-$report[ 'system' ][ 'private' ] = false;
 Api_response::print_json( $report[ 'status' ], $report, 'prod' );

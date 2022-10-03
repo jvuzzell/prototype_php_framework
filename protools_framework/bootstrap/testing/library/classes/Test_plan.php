@@ -13,7 +13,7 @@ use Bootstrap\Shared\Utilities\Classes\Api_response as Api_response;
 
 use \Exception;
 use \ErrorException;
-use \Dump_var;
+use \Dump_var as Dump_var;
 use \XMLWriter;
 use \DOMDocument;
 
@@ -331,6 +331,7 @@ class Test_plan {
             'error' => $this->system[ 'error' ],
             'status' => 200, 
             'issue_id' => 'test_plan_004',
+            'private' => false,
             'message' => 'Test report found', 
             'source' => get_class(),
             'data' => $this->report_summary
@@ -435,6 +436,7 @@ class Test_plan {
         $xml_suites = $xml->createElement( "testsuites" );
 
         foreach( $test_manifest as $suite_key => $suite ) {
+
             $xml_suite = $xml->createElement( "testsuite" );
             $xml_suite->setAttribute( 'name', $suite_key );
 

@@ -2,6 +2,8 @@
 
 namespace Bootstrap\Shared\Utilities\Classes;
 
+use \Dump_var;
+
 /** 
  * @package Standard_api_response
  * @version 1.0
@@ -106,18 +108,18 @@ class Api_response {
     Private static function set_response( $args = array(), string $environment = 'prod' ) {
          
         $default_args = array(
-            'error'           => true,
-            'status'          => 500, 
-            'system'          => array(
-                'issue_id'        => 'standard_api_response_003',
-                'log'             => false,
-                'private'         => true,
-                'continue'        => true,
-                'email'           => false,
+            'error'  => true,
+            'status' => 500, 
+            'system' => array(
+                'issue_id' => 'standard_api_response_003',
+                'log'      => false,
+                'private'  => true,
+                'continue' => true,
+                'email'    => false,
             ),
-            'source'          => get_class(),
-            'message'         => '',
-            'data'            => array(),
+            'source'  => get_class(),
+            'message' => '',
+            'data'    => array(),
         ); 
 
         $args = array_merge( $default_args, $args );
@@ -285,7 +287,7 @@ class Api_response {
 
         $default_args = array(
             'error'       => true,
-            'issue_id'    => 'test_router_1001', // string 
+            'issue_id'    => 'standard_api_response_004', // string 
             'message'     => '', // string
             'data'        => array(),
             'status'      => 500, 
