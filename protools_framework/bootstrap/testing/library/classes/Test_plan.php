@@ -337,11 +337,11 @@ class Test_plan {
     Public function get_test_report() : array {
 
         return $get_plan_response = $this->Response->get_response( array(
-            'error' => $this->system[ 'error' ],
-            'status' => 200, 
-            'issue_id' => 'test_plan_004',
+            'status' => $this->system[ 'status' ],
+            'error' => $this->system[ 'error' ],  
+            'issue_id' => 'test_plan_004', 
+            'message' => $this->system[ 'message' ], 
             'private' => false,
-            'message' => 'Test report found', 
             'source' => get_class(),
             'data' => $this->report_summary
         ) );
@@ -579,7 +579,8 @@ class Test_plan {
         } else {
             $this->report_summary[ 'test_results' ][ 'build_passed' ] = false;
             $this->system[ 'error' ] = true; 
-            $this->system[ 'message' ] = "Build failed tests";
+            $this->system[ 'status' ] = 500;
+            $this->system[ 'message' ] = "Failed tests detected";
         }
 
         $this->add_test_case_results_to_report( $test_results_xml );
