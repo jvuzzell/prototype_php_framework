@@ -19,6 +19,6 @@ $Test_plan = new Test_plan(
     new Filesystem
 );
 
-$Test_plan->run_tests();
+$Test_plan->run_php_tests();
 $report = $Test_plan->get_test_report(); 
 Api_response::print_json( $report[ 'status' ], $report, 'prod' );

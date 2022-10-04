@@ -6,7 +6,7 @@
         "protools_framework" 
     ],
     "test_suites" : [
-        "failed_tests", 
-        "successful_test"
+        "zubair_testing_demo", 
+        "nickturner_testing_demo"
     ]
 }

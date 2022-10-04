@@ -1,0 +1,36 @@
+{
+    "name" : "Nick Turner PHP Unit Demo",
+    "description" : "https://github.com/nickturner/PHPUnit_Html",
+    "test_scripts" : {
+        "DeprecatedTest" : {
+            "test_type" : "phpunit",
+            "description" : "Examples of deprecated tests",
+            "script_location" : "nickturner_demo/DeprecatedTest.php"
+        }, 
+        "ExceptionTest" : {
+            "test_type" : "phpunit",
+            "description" : "Examples of tests that throw exceptions",
+            "script_location" : "nickturner_demo/ExceptionTest.php"
+        }, 
+        "FailedTest" : {
+            "test_type" : "phpunit",
+            "description" : "Examples of tests that failed their testss",
+            "script_location" : "nickturner_demo/FailedTest.php"
+        },
+        "IncompleteTest" : {
+            "test_type" : "phpunit",
+            "description" : "Examples of incomplete tests",
+            "script_location" : "nickturner_demo/IncompleteTest.php"
+        },
+        "PassedTest" : {
+            "test_type" : "phpunit",
+            "description" : "Examples of tests that pass their tests",
+            "script_location" : "nickturner_demo/PassedTest.php"
+        },
+        "SkippedTest" : {
+            "test_type" : "phpunit",
+            "description" : "Examples of skipped tests",
+            "script_location" : "nickturner_demo/SkippedTest.php"
+        }
+    }
+}

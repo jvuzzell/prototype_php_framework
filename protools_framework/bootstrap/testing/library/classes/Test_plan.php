@@ -16,6 +16,7 @@ use \ErrorException;
 use \Dump_var as Dump_var;
 use \XMLWriter;
 use \DOMDocument;
+use \SimpleXMLElement;
 
 /** 
  * @TODO 
@@ -43,6 +44,8 @@ class Test_plan {
         'message' => 'Test plan initailized'
     ); 
 
+    Private $results_manifest = array();
+
     Private $report_summary = array(
         'test_results' => array(
             'build_passed' => false,
@@ -52,10 +55,8 @@ class Test_plan {
                 'start_time' => '', 
                 'end_time' => '',
                 'stats' => array(
-                    'total_duration_seconds' => '0.0000',
-                    'test_suite_total' => 0,  
-                    'test_script_total' => 0,
-                    'test_count' => 0, 
+                    'test_suites' => 0,  
+                    'test_scripts' => 0, 
                     'assertions' => 0, 
                     'errors' => 0, 
                     'warnings' => 0,
@@ -359,40 +360,12 @@ class Test_plan {
 
     }
 
-    Public function run_tests() : array {
-    
-        $Filesystem = $this->Filesystem;
-        $env_config = $this->Env_config->get_env_config(); 
-        $test_directory = $env_config[ 'directories' ][ 'tests' ][ 'shared' ]; 
-    
-        $timestamp = $this->Env_config->get_datetime_now( "Ymd_His" ); 
-        $plan_summary = $this->plan_summary; 
-        $plan_name = strtolower( str_replace( ' ', '-', $plan_summary[ 'test_plan' ]['name' ] ) );
-        $execution_id = $timestamp . '_' . $plan_name;
-        $test_manifest = array();
-
-        // Relevant file paths
-        $test_report_file = Path::normalize( $test_directory . 'reports/report_' . $execution_id . '.json' );
-        $test_script_directory = Path::normalize( $test_directory . 'scripts/' ); 
-        $test_result_directory = Path::normalize( $test_directory . 'test-results/' ); 
-        $test_config_file = $test_directory . 'active_tests/active_' . $execution_id . '.xml';
-        $test_config_file_archive = $test_directory . 'archive/archived_' . $execution_id . '.xml';
-
-        // Prevent the same test from running simultaneously
-        if( file_exists( $test_config_file ) ) {
-            throw new Exception( 'Test already running' );
-        }
-
-        // Verify that PHPUnit is installed
-        $phpunit_location = $env_config[ 'directories' ][ 'vendor' ] . 'phpunit/phpunit/phpunit'; 
-        if( !file_exists( $phpunit_location ) ) {
-            throw new Exception( 'PHPUnit not available' );
-        }
+    Private function get_test_manifest( array $test_suites, string $test_script_directory, string $test_result_directory ) : array {
 
         // Compile cases for testing and reporting
-        foreach( $this->report_summary[ 'test_suites' ] as $suite_key => $test_suite_data ) {
+        foreach( $test_suites as $suite_key => $test_suite_data ) {
             
-            $this->report_summary[ 'test_results' ][ 'details' ][ 'stats' ][ 'test_suite_total' ]++; 
+            $this->report_summary[ 'test_results' ][ 'details' ][ 'stats' ][ 'test_suites' ]++; 
             
             // Loop over test cases  
             foreach( $test_suite_data[ 'test_scripts' ] as $script_key => $script_data ) {
@@ -406,12 +379,11 @@ class Test_plan {
 
                     $test_manifest[ $suite_key ][ $script_key ] = array(
                         'test_script' => $test_script, 
-                        'results_file' => $test_results_file,
-                        'finished' => false
+                        'results_file' => $test_results_file
                     );
 
                     $this->report_summary[ 'test_suites' ][ $suite_key ][ 'test_scripts' ][ $script_key ][ 'script_location' ] = $test_script;
-                    $this->report_summary[ 'test_results' ][ 'details' ][ 'stats' ][ 'test_script_total' ]++; 
+                    $this->report_summary[ 'test_results' ][ 'details' ][ 'stats' ][ 'test_scripts' ]++; 
 
                 } else {
                     
@@ -423,12 +395,14 @@ class Test_plan {
 
         }
 
-        // Publish report as semaphore to prevent other tests from running concurrently
-        $this->report_summary[ 'test_results' ][ 'details' ][ 'execution_id' ] = $execution_id;
-        $this->report_summary[ 'test_results' ][ 'details' ][ 'start_time' ] = $this->Env_config->get_datetime_now( 'Y-m-d h:m:s.u' );
-        $start_time_microseconds = microtime(true);
+        return $test_manifest;
+
+    }
+
+    Private function compile_phpunit_xml_config( array $test_manifest, string $test_config_file ) {
 
         $test_manifest_xml = array( 'testsuite' => array() );
+        $env_config = $this->Env_config->get_env_config(); 
 
         // Compile PHPUnit Config File
         $xml = new DOMDocument( "1.0", "utf-8" );
@@ -464,6 +438,122 @@ class Test_plan {
         $xml->appendChild( $xml_phpunit );
         $xml->save( $test_config_file );
 
+        return file_exists( $test_config_file );
+
+    }
+
+    Private function add_test_case_results_to_report( SimpleXMLElement $test_results_xml  ) {
+
+        $this->recursively_manifest_test_results_xml( $test_results_xml );
+        
+        foreach( $this->results_manifest as $keys => $entry ) {
+
+            $filepath = $entry[ 'file' ]; 
+            $filepath_segments = explode( '/', $filepath );
+            $filename = $filepath_segments[ count( $filepath_segments ) - 1 ];
+            $classname = str_replace( '.php', '', $filename );
+
+            foreach( $this->report_summary[ 'test_suites' ] as $suite_key => $suite ) {
+
+                if( 
+                    isset( $this->report_summary[ 'test_suites' ][ $suite_key ][ 'test_scripts' ][ $classname ] ) &&
+                    $filepath === $this->report_summary[ 'test_suites' ][ $suite_key ][ 'test_scripts' ][ $classname ][ 'script_location' ]
+                ) {
+                    $this->report_summary[ 'test_suites' ][ $suite_key ][ 'test_scripts' ][ $classname ][ 'results' ] = $entry;
+                    unset( $this->report_summary[ 'test_suites' ][ $suite_key ][ 'test_scripts' ][ $classname ][ 'results' ][ 'file' ] );
+                    break;
+                }
+    
+            }
+
+        }
+
+    }
+
+    Private function recursively_manifest_test_results_xml( $xml, $parent = '', $testsuite_name = '' ) {
+
+        foreach( $xml as $key => $value)  {
+   
+            if( isset( $value->children()->testcase ) ) {
+
+                $testsuite_attributes = json_decode( json_encode( $value->attributes() ), true )[ '@attributes' ];
+                $testsuite_name = $testsuite_attributes[ 'name' ]; 
+                $this->results_manifest[ $testsuite_name ] = $testsuite_attributes;
+
+            }
+
+            if( $key == 'testcase' ) {
+
+                $testcase_attributes = json_decode( json_encode( $value->attributes() ), true )[ '@attributes' ]; 
+                $testcase_name = $testcase_attributes[ 'name' ];
+                $this->results_manifest[ $testsuite_name ][ 'test_cases' ][ $testcase_name ] = $testcase_attributes;
+                
+                if( isset( $value->error ) ) {
+                    $this->results_manifest[ $testsuite_name ][ 'test_cases' ][ $testcase_name ][ 'error' ] = $value->error;
+                }
+
+                if( isset( $value->failure ) ) {
+                    $this->results_manifest[ $testsuite_name ][ 'test_cases' ][ $testcase_name ][ 'failure' ] = $value->failure;
+                }
+                
+            } else {
+
+                $this->recursively_manifest_test_results_xml( $value, $parent . "." . $key, $testsuite_name );
+
+            }
+
+        }
+
+    }
+
+
+    Public function run_php_tests() : array {
+    
+        $Filesystem = $this->Filesystem;
+        $env_config = $this->Env_config->get_env_config(); 
+        $test_directory = $env_config[ 'directories' ][ 'tests' ][ 'shared' ]; 
+    
+        $timestamp = $this->Env_config->get_datetime_now( "Ymd_His" ); 
+        $plan_summary = $this->plan_summary; 
+        $plan_name = strtolower( str_replace( ' ', '-', $plan_summary[ 'test_plan' ]['name' ] ) );
+        $execution_id = $timestamp . '_' . $plan_name;
+        $test_manifest = array();
+
+        // Relevant file paths
+        $test_report_file = Path::normalize( $test_directory . 'reports/report_' . $execution_id . '.json' );
+        $test_script_directory = Path::normalize( $test_directory . 'scripts/' ); 
+        $test_result_directory = Path::normalize( $test_directory . 'test-results/' ); 
+        $test_config_file = $test_directory . 'active_tests/active_' . $execution_id . '.xml';
+        $test_config_file_archive = $test_directory . 'archive/archived_' . $execution_id . '.xml';
+
+        // Prevent the same test from running simultaneously
+        if( file_exists( $test_config_file ) ) {
+            throw new Exception( 'Test already running' );
+        }
+
+        // Verify that PHPUnit is installed
+        $phpunit_location = $env_config[ 'directories' ][ 'vendor' ] . 'phpunit/phpunit/phpunit'; 
+        if( !file_exists( $phpunit_location ) ) {
+            throw new Exception( 'PHPUnit not available' );
+        }
+
+        $test_manifest = $this->get_test_manifest( 
+            $this->report_summary[ 'test_suites' ], 
+            $test_script_directory, 
+            $test_result_directory 
+        );
+
+        // Publish report as semaphore to prevent other tests from running concurrently
+        $this->report_summary[ 'test_results' ][ 'details' ][ 'execution_id' ] = $execution_id;
+        $this->report_summary[ 'test_results' ][ 'details' ][ 'start_time' ] = $this->Env_config->get_datetime_now( 'Y-m-d h:m:s.u' );
+        $start_time_microseconds = microtime(true);
+
+        $xml_file_exists = $this->compile_phpunit_xml_config( $test_manifest, $test_config_file );
+
+        if( !$xml_file_exists ) {
+            throw new Exception( 'Failed to create config file for PHPUnit' );
+        }
+
         $test_results_file = $test_result_directory . $execution_id . '.xml'; 
  
         // Run PHPUnit
@@ -473,29 +563,20 @@ class Test_plan {
         // @todo Log errors to a stream or database
         // throw new ProcessFailedException($process);
 
-        // $end_time_microseconds = microtime(true);
-        // $total_time_lapsed_seconds = ( ( ( $end_time_microseconds - $start_time_microseconds ) * 1000 ) / 1000 ); // Convert microseconds > milliseconds > seconds
-        // $this->report_summary[ 'test_results' ][ 'details' ][ 'stats' ][ 'total_duration_seconds' ] =  $total_time_lapsed_seconds; 
-
         // Read test result XML
         $test_results_xml = simplexml_load_file( $test_results_file );
-        $failed_tests = (int) $test_results_xml->testsuite->attributes()->failures; 
+        $testsuite_stats = json_decode( json_encode( $test_results_xml->testsuite->attributes() ), true )[ '@attributes' ];
 
         $this->report_summary[ 'test_results' ][ 'details' ][ 'end_time' ] = $this->Env_config->get_datetime_now( 'Y-m-d h:m:s.u' );
         $this->report_summary[ 'test_results' ][ 'details' ][ 'results_file' ] = $test_results_file;
-        $this->report_summary[ 'test_results' ][ 'details' ][ 'stats' ][ 'total_duration_seconds' ] = (float) $test_results_xml->testsuite->attributes()->time; 
-        $this->report_summary[ 'test_results' ][ 'details' ][ 'stats' ][ 'test_count' ] = (int) $test_results_xml->testsuite->attributes()->tests; 
-        $this->report_summary[ 'test_results' ][ 'details' ][ 'stats' ][ 'assertions' ] = (int) $test_results_xml->testsuite->attributes()->assertions; 
-        $this->report_summary[ 'test_results' ][ 'details' ][ 'stats' ][ 'errors' ] = (int) $test_results_xml->testsuite->attributes()->errors;
-        $this->report_summary[ 'test_results' ][ 'details' ][ 'stats' ][ 'warnings' ] = (int) $test_results_xml->testsuite->attributes()->warnings;
-        $this->report_summary[ 'test_results' ][ 'details' ][ 'stats' ][ 'failures' ] = $failed_tests;
-        $this->report_summary[ 'test_results' ][ 'details' ][ 'stats' ][ 'skipped' ] = (int) $test_results_xml->testsuite->attributes()->skipped;
-                
-        if( $failed_tests === 0 ) {
+        $stats = array_merge( $this->report_summary[ 'test_results' ][ 'details' ][ 'stats' ], $testsuite_stats );
+        $this->report_summary[ 'test_results' ][ 'details' ][ 'stats' ] = $stats;
 
+        if( (int) $stats[ 'failures' ] === 0 && (int) $stats[ 'errors' ] === 0 ) {
             $this->report_summary[ 'test_results' ][ 'build_passed' ] = true;
-
         }
+
+        $this->add_test_case_results_to_report( $test_results_xml );
 
         $this->Filesystem->touch( $test_report_file );
         $this->Filesystem->appendToFile( $test_report_file, json_encode( $this->report_summary, JSON_PRETTY_PRINT ), true );

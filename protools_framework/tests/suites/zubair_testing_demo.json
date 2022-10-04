@@ -1,0 +1,11 @@
+{
+    "name" : "Zubair Demo Suite",
+    "description" : "https://github.com/Zubs/php-testing/blob/master/tests/UserTest.php",
+    "test_scripts" : {
+        "UserTest" : {
+            "test_type" : "phpunit",
+            "description" : "Zubair Tests",
+            "script_location" : "zubair/UserTest.php"
+        }
+    }
+}
