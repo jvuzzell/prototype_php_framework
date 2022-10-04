@@ -21,4 +21,15 @@ $Test_plan = new Test_plan(
 
 $Test_plan->run_php_tests();
 $report = $Test_plan->get_test_report(); 
-Api_response::print_json( $report[ 'status' ], $report, 'prod' );
+
+if( IS_CLI && !$report[ 'data' ][ 'test_results' ][ 'build_passed' ] ) {
+
+    Api_response::print_stderr( $report[ 'status' ], $report, 'prod' );
+
+}
+
+if( IS_CLI ) {
+    Api_response::print_json( $report[ 'status' ], $report, 'prod' );
+} else {
+    Api_response::route_to_custom_page( $report[ 'status' ], $report, 'test_report_page.php', 'prod' ); 
+}
