@@ -24,7 +24,7 @@ $report = $Test_plan->get_test_report();
 
 if( IS_CLI && !$report[ 'data' ][ 'test_results' ][ 'build_passed' ] ) {
 
-    Api_response::print_stderr( $report[ 'status' ], $report, 'prod' );
+    Api_response::print_stderr( 500, $report, 'prod' );
 
 }
 
