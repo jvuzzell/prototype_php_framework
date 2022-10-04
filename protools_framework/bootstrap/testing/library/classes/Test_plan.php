@@ -40,6 +40,7 @@ class Test_plan {
     Private $Env_config = null; // Object
     Private $get_response = null; // Function
     Private $system = array(
+        'status' => 200,
         'error' => false, 
         'message' => 'Test plan initailized'
     ); 
@@ -574,6 +575,11 @@ class Test_plan {
 
         if( (int) $stats[ 'failures' ] === 0 && (int) $stats[ 'errors' ] === 0 ) {
             $this->report_summary[ 'test_results' ][ 'build_passed' ] = true;
+            $this->system[ 'message' ] = "All tests passed";
+        } else {
+            $this->report_summary[ 'test_results' ][ 'build_passed' ] = false;
+            $this->system[ 'error' ] = true; 
+            $this->system[ 'message' ] = "Build failed tests";
         }
 
         $this->add_test_case_results_to_report( $test_results_xml );
@@ -585,10 +591,10 @@ class Test_plan {
         $this->Filesystem->rename( $test_config_file, $test_config_file_archive, true );
 
         return $this->Response->get_response( array(
-            'status' => 200,
-            'error' => false,  
+            'status' => $this->system[ 'status' ],
+            'error' => $this->system[ 'error' ],  
             'issue_id' => 'test_plan_015', 
-            'message' => 'Test plan ran successfully', 
+            'message' => $this->system[ 'message' ], 
             'source' => get_class(), 
             'data' => array(
                 'test_report_file' => $test_report_file 

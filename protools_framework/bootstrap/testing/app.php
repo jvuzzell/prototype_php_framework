@@ -22,10 +22,10 @@ $Test_plan = new Test_plan(
 $Test_plan->run_php_tests();
 $report = $Test_plan->get_test_report(); 
 
-if( IS_CLI && !$report[ 'data' ][ 'test_results' ][ 'build_passed' ] ) {
-
+if( IS_CLI && $report[ 'data' ][ 'test_results' ][ 'build_passed' ] === false ) {
+    
     Api_response::print_stderr( 500, $report, 'prod' );
-
+    exit;
 }
 
 if( IS_CLI ) {
