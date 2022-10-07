@@ -571,7 +571,7 @@ class Test_plan {
         // Relevant file paths
         $test_report_file = Path::normalize( $test_directory . 'reports/report_' . $execution_id . '.json' );
         $test_script_directory = Path::normalize( $test_directory . 'scripts/' ); 
-        $test_result_directory = Path::normalize( $test_directory . 'test_results/' ); 
+        $test_result_directory = Path::normalize( $test_directory . 'test-results/' ); 
         $test_config_file = $test_directory . 'active_tests/active_' . $execution_id . '.xml';
         $test_config_file_archive = $test_directory . 'archive/archived_' . $execution_id . '.xml';
 

@@ -11,4 +11,4 @@ rm -r $protools_framework_dir/tests/test_results
 cp -R $setup_files/tests/active_tests $protools_framework_dir/tests/active_tests
 cp -R $setup_files/tests/archive $protools_framework_dir/tests/archive
 cp -R $setup_files/tests/reports $protools_framework_dir/tests/reports
-cp -R $setup_files/tests/test_results  $protools_framework_dir/tests/test_results 
+cp -R $setup_files/tests/test-results  $protools_framework_dir/tests/test-results 
