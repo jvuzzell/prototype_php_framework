@@ -110,7 +110,7 @@ class Test_plan {
         }
 
         // Step 2. Get Test suites
-        $test_suites_response = $this->get_test_suites( $env_config[ 'app_path' ][ 'application' ], $test_plan[ 'test_suites' ], $test_directories );
+        $test_suites_response = $this->get_test_suites( $env_config[ 'app_path' ][ 'module' ], $test_plan[ 'test_suites' ], $test_directories );
 
         if( $test_suites_response[ 'error' ] ) {
             throw new Exception( $test_suites_response[ 'message' ] );
@@ -129,11 +129,19 @@ class Test_plan {
 
         // Step 4. Set report meta 
         $this->report_summary[ 'environment' ][ 'name' ] = $env_config[ 'env_name' ];
-        $this->report_summary[ 'environment' ][ 'host_name' ] = $env_config[ 'domain' ];
+        $this->report_summary[ 'environment' ][ 'host_name' ] = $env_config[ 'app_path' ][ 'domain' ];
         $this->report_summary[ 'test_plan' ][ 'name' ] = $test_plan[ 'name' ];
         $this->report_summary[ 'test_plan' ][ 'description' ] = $test_plan[ 'description' ];
         $this->report_summary[ 'test_suites' ] = $test_suites;
         $this->report_summary[ 'code' ] = $this->code;
+
+        $test_directory = $env_config[ 'directories' ][ 'tests' ][ 'shared' ]; 
+        $this->plan_summary[ 'timestamp' ] = $this->Env_config->get_datetime_now( "Ymd_His" ); 
+        $plan_summary = $this->plan_summary; 
+        $plan_name = strtolower( str_replace( ' ', '-', $plan_summary[ 'test_plan' ]['name' ] ) );
+        $execution_id = $this->plan_summary[ 'timestamp' ] . '_' . $plan_name;
+
+        $this->report_summary[ 'test_results' ][ 'details' ][ 'execution_id' ] =  $execution_id;
 
     }
 
@@ -176,7 +184,7 @@ class Test_plan {
 
     Private function get_plan( array $app_path, array $test_directories ) : array {
 
-        if( $app_path[ 'module' ] === 'default' ) {
+        if( $app_path[ 'application' ] === 'default' ) {
 
             $get_plan_response = $this->Response->get_response( array(
                 'status' => 404, 
@@ -187,7 +195,7 @@ class Test_plan {
 
         } else {  
             
-            $test_plan_file_name = $test_directories[ 'shared' ] . '/plans/' . $app_path[ 'module' ] . '.json'; 
+            $test_plan_file_name = $test_directories[ 'shared' ] . '/plans/' . $app_path[ 'application' ] . '.json'; 
          
             if( file_exists( $test_plan_file_name ) ) {
 
@@ -303,7 +311,7 @@ class Test_plan {
                     return $this->Response->get_response( array(
                         'status' => $specific_test_suite_response[ 'status' ], 
                         'issue_id' => 'test_plan_009', 
-                        'message' => $specific_test_suite_response[ 'message' ] . '; Test Suite - ' . $test_plan_suites[ $i ],
+                        'message' => $specific_test_suite_response[ 'message' ] . '; Test Suite - ' . $specific_test_suite,
                         'source' => get_class() 
                     ) );
 
@@ -363,25 +371,35 @@ class Test_plan {
 
     Private function get_test_manifest( array $test_suites, string $test_script_directory, string $test_result_directory ) : array {
 
+        $tmp_manifest = array();
+
         // Compile cases for testing and reporting
         foreach( $test_suites as $suite_key => $test_suite_data ) {
-            
-            $this->report_summary[ 'test_results' ][ 'details' ][ 'stats' ][ 'test_suites' ]++; 
             
             // Loop over test cases  
             foreach( $test_suite_data[ 'test_scripts' ] as $script_key => $script_data ) {
 
                 $test_script = $test_script_directory . $script_data[ 'script_location' ];
 
-                if( file_exists( $test_script ) ) { 
-                    
-                    // Create file for storing results of test case
-                    $test_results_file = $test_result_directory . '/' . $script_key . '.xml'; 
+                if( is_dir( $test_script ) ) {
 
-                    $test_manifest[ $suite_key ][ $script_key ] = array(
-                        'test_script' => $test_script, 
-                        'results_file' => $test_results_file
-                    );
+                    $tmp_manifest = glob( $test_script . '*.php' ); 
+
+                    for( $i = 0; $i < count( $tmp_manifest ); $i++ ) {
+
+                        $tmp_script_key = str_replace( '.php', '', basename( $tmp_manifest[ $i ] ) ); // In theory this is the same as the class
+                        $test_manifest[ $suite_key ][ $tmp_script_key ] = $this->set_manifest( $suite_key, $tmp_script_key, $tmp_manifest[ $i ], $test_result_directory );
+
+                        $this->report_summary[ 'test_suites' ][ $suite_key ][ 'test_scripts' ][ $tmp_script_key ][ 'script_location' ] = $tmp_manifest[ $i ];
+                        $this->report_summary[ 'test_results' ][ 'details' ][ 'stats' ][ 'test_scripts' ]++; 
+
+                    }
+
+                    unset( $this->report_summary[ 'test_suites' ][ $suite_key ][ 'test_scripts' ][ $script_key ] ); // Clean up directory, because it is not used in the report
+
+                } else if( file_exists( $test_script ) ) { 
+
+                    $test_manifest[ $suite_key ][ $script_key ] = $this->set_manifest( $suite_key, $script_key, $test_script, $test_result_directory  );
 
                     $this->report_summary[ 'test_suites' ][ $suite_key ][ 'test_scripts' ][ $script_key ][ 'script_location' ] = $test_script;
                     $this->report_summary[ 'test_results' ][ 'details' ][ 'stats' ][ 'test_scripts' ]++; 
@@ -400,7 +418,18 @@ class Test_plan {
 
     }
 
-    Private function compile_phpunit_xml_config( array $test_manifest, string $test_config_file ) {
+    Private function set_manifest( $suite_key, $script_key, $filename, $test_result_directory ) {
+        // Create file for storing results of test case
+        $test_results_file = $test_result_directory . '/' . $script_key . '.xml'; 
+
+        return array(
+            'test_script' => $filename, 
+            'results_file' => $test_results_file
+        );
+
+    }
+
+    Private function compile_phpunit_xml_config( string $execution_id, array $test_manifest, string $test_config_file, string $test_results_directory ) {
 
         $test_manifest_xml = array( 'testsuite' => array() );
         $env_config = $this->Env_config->get_env_config(); 
@@ -423,9 +452,7 @@ class Test_plan {
             $xml_suite->setAttribute( 'name', $suite_key );
 
             foreach( $suite as $file_key => $file ) {     
-                
-                // @todo check to see if file is a directory
-                // $xml_file = $xml->createElement( "directory", $file[ 'test_script' ] );
+            
                 $xml_file = $xml->createElement( "file", $file[ 'test_script' ] );
                 $xml_suite->appendChild( $xml_file );
 
@@ -436,6 +463,28 @@ class Test_plan {
         }
 
         $xml_phpunit->appendChild( $xml_suites );
+       
+
+        // Logging 
+        $xml_logging = $xml->createElement( "logging" );
+
+        $xml_log = $xml->createElement( "log" );
+        $xml_log->setAttribute( "type", "junit" );
+        $xml_log->setAttribute( "target", $test_results_directory . $execution_id . ".xml" ); 
+        $xml_logging->appendChild( $xml_log );
+
+        // $xml_log = $xml->createElement( "log" );
+        // $xml_log->setAttribute( "type", "testdox-html" );
+        // $xml_log->setAttribute( "target", $test_results_directory . $execution_id . ".html" ); 
+        // $xml_logging->appendChild( $xml_log );
+
+        // $xml_log = $xml->createElement( "log" );
+        // $xml_log->setAttribute( "type", "testdox-text" );
+        // $xml_log->setAttribute( "target", $test_results_directory . $execution_id . ".txt" ); 
+        // $xml_logging->appendChild( $xml_log );
+
+        $xml_phpunit->appendChild( $xml_logging );
+
         $xml->appendChild( $xml_phpunit );
         $xml->save( $test_config_file );
 
@@ -445,9 +494,9 @@ class Test_plan {
 
     Private function add_test_case_results_to_report( SimpleXMLElement $test_results_xml  ) {
 
-        $this->recursively_manifest_test_results_xml( $test_results_xml );
-        
-        foreach( $this->results_manifest as $keys => $entry ) {
+        $results_manifest = $this->recursively_manifest_test_results_xml( $test_results_xml );
+     
+        foreach( $results_manifest as $keys => $entry ) {
 
             $filepath = $entry[ 'file' ]; 
             $filepath_segments = explode( '/', $filepath );
@@ -505,6 +554,8 @@ class Test_plan {
 
         }
 
+        return $this->results_manifest;
+
     }
 
 
@@ -514,16 +565,13 @@ class Test_plan {
         $env_config = $this->Env_config->get_env_config(); 
         $test_directory = $env_config[ 'directories' ][ 'tests' ][ 'shared' ]; 
     
-        $timestamp = $this->Env_config->get_datetime_now( "Ymd_His" ); 
-        $plan_summary = $this->plan_summary; 
-        $plan_name = strtolower( str_replace( ' ', '-', $plan_summary[ 'test_plan' ]['name' ] ) );
-        $execution_id = $timestamp . '_' . $plan_name;
+        $execution_id = $this->report_summary[ 'test_results' ][ 'details' ][ 'execution_id' ];
         $test_manifest = array();
 
         // Relevant file paths
         $test_report_file = Path::normalize( $test_directory . 'reports/report_' . $execution_id . '.json' );
         $test_script_directory = Path::normalize( $test_directory . 'scripts/' ); 
-        $test_result_directory = Path::normalize( $test_directory . 'test-results/' ); 
+        $test_result_directory = Path::normalize( $test_directory . 'test_results/' ); 
         $test_config_file = $test_directory . 'active_tests/active_' . $execution_id . '.xml';
         $test_config_file_archive = $test_directory . 'archive/archived_' . $execution_id . '.xml';
 
@@ -545,20 +593,17 @@ class Test_plan {
         );
 
         // Publish report as semaphore to prevent other tests from running concurrently
-        $this->report_summary[ 'test_results' ][ 'details' ][ 'execution_id' ] = $execution_id;
         $this->report_summary[ 'test_results' ][ 'details' ][ 'start_time' ] = $this->Env_config->get_datetime_now( 'Y-m-d h:m:s.u' );
-        $start_time_microseconds = microtime(true);
-
-        $xml_file_exists = $this->compile_phpunit_xml_config( $test_manifest, $test_config_file );
-
-        if( !$xml_file_exists ) {
-            throw new Exception( 'Failed to create config file for PHPUnit' );
-        }
 
         $test_results_file = $test_result_directory . $execution_id . '.xml'; 
+        $xml_file_exists = $this->compile_phpunit_xml_config( $execution_id, $test_manifest, $test_config_file, $test_result_directory );
+
+        if( ! $xml_file_exists ) {
+            throw new Exception( 'Failed to create config file for PHPUnit' );
+        }
  
         // Run PHPUnit
-        $process = new Process([ $phpunit_location, '--log-junit', $test_results_file, '-c', $test_config_file ]);
+        $process = new Process([ $phpunit_location, '-c', $test_config_file ]);
         $process->run();
 
         // @todo Log errors to a stream or database

@@ -110,9 +110,9 @@ function check_client_error( $Environment_config, $client_name ) {
         $env_config_client_response = $Environment_config->get_client( $client_name ); 
     
         if( IS_CLI ) {
-            $Api_response::print_json( $env_config_client_response[ 'status' ], $env_config_client_response, ENV_NAME );
+            Api_response::print_json( $env_config_client_response[ 'status' ], $env_config_client_response, ENV_NAME );
         } else {
-            $Api_response::route_to_custom_page( $env_config_client_response[ 'status' ], $env_config_client_response, ERROR_PAGE, ENV_NAME );
+            Api_response::route_to_custom_page( $env_config_client_response[ 'status' ], $env_config_client_response, ERROR_PAGE, ENV_NAME );
         }
     
     } 
@@ -120,6 +120,7 @@ function check_client_error( $Environment_config, $client_name ) {
 }
 
 $_SERVER[ 'REQUEST_SCHEME' ] = $Environment_config->get_request_protocol();
+$environment_folders = $Environment_config->get_env_config()[ 'directories' ]; 
 
 /**
  * Configure Site Paths and URLs
@@ -138,6 +139,14 @@ if( !IS_CLI ) {
     if ( ! defined( 'ERROR_PAGE' ) ) {
         define( 'ERROR_PAGE', SITE_DIR .'/error_page.php' );
     }    
+
+    if ( !defined( 'SHARED_PORTFOLIO_DIR' ) ) {
+        define( 'SHARED_PORTFOLIO_DIR', $environment_folders[ 'portfolio' ][ 'shared' ] );
+    }
+
+    if ( !defined( 'SITE_PORTFOLIO_DIR' ) ) {
+        define( 'SITE_PORTFOLIO_DIR', $environment_folders[ 'portfolio' ][ 'site_specific' ] );
+    }
 
 }
 
