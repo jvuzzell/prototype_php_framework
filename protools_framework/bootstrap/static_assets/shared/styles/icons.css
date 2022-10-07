@@ -1,0 +1,97 @@
+/* Icon Layout */
+
+.icon {
+    min-width: 12px;
+    margin-bottom: 0;
+}
+
+.icons-set img,
+.icon-left img, 
+.icon-right img, 
+a.icons-set img,
+a.icon-right img,
+a.icon-left img {
+    display: inline-block;
+    vertical-align: middle;
+    margin-bottom: 0; 
+}
+
+.icons-set > *,
+.icon-right > *, 
+.icon-left > * { 
+    display: inline-block;
+    vertical-align: middle;    
+}
+
+.icons-set > button,
+.icon-right > button, 
+.icon-left > button {
+    padding: 0;
+}
+
+.icons-set button:nth-child(n+2){
+    margin-left: 17px;
+}
+
+.icon-right img { 
+    margin-left: 4px;
+}
+
+.icon-left img {
+    margin-right: 3px; 
+    transform: translateY(-1px);
+}
+
+.icon-right > button:first-of-type {
+    min-width: 20px;
+}
+
+.icon-right p:first-child,
+.icon-right h1:first-child,
+.icon-right h2:first-child,
+.icon-right h3:first-child,
+.icon-right h4:first-child,
+.icon-right h5:first-child,
+.icon-right h6:first-child,
+.icon-right ol:first-child,
+.icon-right ul:first-child,
+.icon-right dl:first-child,
+.icon-right li:first-child,
+.icon-left p:first-child,
+.icon-left h1:first-child,
+.icon-left h2:first-child,
+.icon-left h3:first-child,
+.icon-left h4:first-child,
+.icon-left h5:first-child,
+.icon-left h6:first-child,
+.icon-left ol:first-child,
+.icon-left ul:first-child,
+.icon-left dl:first-child,
+.icon-left li:first-child {
+    width: auto;
+}
+
+.icon-right select:first-child, 
+.icon-right textarea:first-child, 
+.icon-right input:not([type="radio"]):not([type="checkbox"]):first-child,
+.icon-left select:nth-child(2), 
+.icon-left textarea:nth-child(2), 
+.icon-left input:not([type="radio"]):not([type="checkbox"]):nth-child(2) {
+    width: calc( 100% - 32px );
+}
+
+.icon.placeholder {
+    width: 27px; /* width of an icon with padding */ 
+}
+
+.icon.large-icon {
+    min-width: 24px;
+}
+
+button.icon-left img {
+    padding-right: 10px;
+}
+
+button.icon-right img {
+    padding-left: 10px;
+}

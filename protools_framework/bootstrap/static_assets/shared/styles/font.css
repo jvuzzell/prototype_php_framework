@@ -1,0 +1,177 @@
+/* Note: Google Font Roboto, imported in the head of the HTML document */
+
+/* Font Sizes */
+
+body, 
+.v-col, 
+ol,
+ul,
+dl,
+pre,
+address, 
+blockquote, 
+form input, 
+form select, 
+form textarea, 
+form label, 
+button, 
+a {
+    font: 16px/22px 'Roboto', sans-serif;
+}
+
+h1:not([class*='font-size']), .has-xx-large-font-size {
+    font: 32px/44px 'Roboto', sans-serif;
+    font-weight: 700;
+}
+
+h2:not([class*='font-size']), .has-x-large-font-size {
+    font: 27px/37px 'Roboto', sans-serif;
+    font-weight: 700;
+}
+
+h3:not([class*='font-size']), .has-large-font-size {
+    font: 21px/29px 'Roboto', sans-serif;
+    font-weight: 500;
+}
+
+h4:not([class*='font-size']), .has-medium-font-size {
+    font: 16px/22px 'Roboto', sans-serif;
+    font-weight: 300;
+}
+
+p, .has-regular-font-size {
+    font: 14px/19px 'Roboto', sans-serif;
+}
+
+ul li {
+    list-style-position: inside;
+}
+
+.has-small-font-size {
+    font-size: 12px;
+}
+
+.has-text-center {
+    text-align: center;
+}
+
+.has-text-right {
+    text-align: right;
+}
+
+.has-text-left {
+    text-align: left;
+}
+
+.has-float-right {
+    float: right;
+}
+
+.has-float-left {
+    float: left;
+}
+
+/* Font Weights */
+
+b, strong, .has-bold-font-weight {
+  font-weight: 700 !important;
+}
+
+.has-semibold-font-weight, .has-medium-font-weight {
+  font-weight: 500 !important;
+}
+
+.has-regular-font-weight {
+  font-weight: 400 !important;
+}
+
+.has-light-font-weight {
+  font-weight: 300 !important;
+}
+
+/* Font Styles */
+
+em, .has-italic-font-style {
+  font-style: italic !important;
+}
+
+.has-uppercase-font-style {
+  text-transform: uppercase !important;
+}
+
+u, .has-underline-font-style {
+  text-decoration: underline !important;
+}
+
+.text-align-right {
+    text-align: right;
+}
+
+.has-right-aligned-text > * {
+    text-align: right;
+}
+
+/* media-quries */
+@media (max-width: 639.98px) {
+
+    h2:not([class*='font-size']),
+    .has-large-font-size {
+        font: 20px/26px 'Roboto', sans-serif;
+        font-weight: 700;
+    }
+
+    h3:not([class*='font-size']),
+    .has-large-font-size {
+        font: 16px/24px 'Roboto', sans-serif;
+        font-weight: 500;
+    }
+
+    .has-sm-text-left{
+        text-align: left;
+    }
+
+    .has-md-text-center{
+        text-align: center;
+    }
+
+}
+
+@media (max-width: 640px) {
+    
+    .has-sm-text-center {
+        text-align: center;
+    }
+
+}
+
+@media (min-width: 640px) and (max-width: 1599.98px) {
+
+    h2:not([class*='font-size']),
+    .has-large-font-size {
+        font: 23px/29px 'Roboto', sans-serif;
+        font-weight: 700;
+    }
+
+    h3:not([class*='font-size']),
+    .has-large-font-size {
+        font: 18px/26px 'Roboto', sans-serif;
+        font-weight: 500;
+    }
+
+    .has-md-text-center {
+        text-align: center;
+    }
+
+}
+
+@media (min-width: 1600px) {
+
+    p, .has-regular-font-size {
+        font: 16px/22px 'Roboto', sans-serif;
+    }
+
+}
+
+.has-text-no-wrap {
+    white-space: nowrap;
+}

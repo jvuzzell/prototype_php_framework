@@ -1,0 +1,172 @@
+/* Background Color */
+
+.has-background-color-white {
+    background-color: white;
+}
+
+.has-background-color-input-gray {
+    background-color: #F0F3F6; 
+}
+
+.has-background-color-light-gray {
+    background-color:lightgray; 
+}
+
+.has-background-color-white-smoke {
+    background-color: #efefef;
+}
+
+.has-background-color-terra-cotta {
+    background-color: #e05206;
+}
+
+.has-background-color-graphite {
+    background-color: #4d4f53;
+}
+
+.has-background-color-cool-mint {
+    background-color: #72ce9b;
+}
+
+.has-background-color-kalamata {
+    background-color: #502b3a;
+}
+
+.has-background-color-platinum {
+    background-color: #c7d1c5;
+}
+
+.has-background-color-tangerine {
+    background-color: #ce8e00;
+}
+
+.has-background-color-navy-blue {
+    background-color: #2B2D41;
+}
+
+.has-background-color-money-green {
+    background-color: #14892C;
+}
+
+.has-background-color-true-blue {
+    background-color: #0052CC;
+}
+
+.has-background-color-blue-cloud {
+    background-color: #f3f6f9; 
+}
+
+
+/* Color */
+.has-white-color {
+    color: white;
+}
+
+.has-gray-0-color {
+    color: #f8f9fa; 
+}
+
+.has-light-gray-color {
+    color:lightgray; 
+}
+
+.has-white-smoke-color {
+    color: #efefef;
+}
+
+.has-terra-cotta-color {
+    color: #e05206;
+}
+
+.has-graphite-color {
+    color: #4d4f53;
+}
+
+.has-cool-mint-color {
+    color: #72ce9b;
+}
+
+.has-kalamata-color {
+    color: #502b3a;
+}
+
+.has-platinum-color {
+    color: #c7d1c5;
+}
+
+.has-tangerine-color {
+    color: #ce8e00;
+}
+
+.has-color-navy-blue {
+    color: #2B2D41;
+}
+
+.has-color-money-green {
+    color: #14892C;
+}
+
+.has-color-true-blue {
+    color: #0052CC;
+}
+
+.has-color-blue-cloud {
+    color: #f3f6f9;
+}
+
+/* Border Color */
+.has-border-white-color {
+    border-color: white !important;
+}
+
+.has-border-gray-0-color {
+    border-color: #f8f9fa !important; 
+}
+
+.has-border-light-gray-color {
+    border-color:lightgray !important; 
+}
+
+.has-border-white-smoke-color {
+    border-color: #efefef !important;
+}
+
+.has-border-blue-cloud-color {
+    border-color: #f3f6f9 !important;
+}
+
+.has-border-terra-cotta-color {
+    border-color: #e05206 !important;
+}
+
+.has-border-graphite-color {
+    border-color: #4d4f53 !important;
+}
+
+.has-border-cool-mint-color {
+    border-color: #72ce9b !important;
+}
+
+.has-border-kalamata-color {
+    border-color: #502b3a !important;
+}
+
+.has-border-platinum-color {
+    border-color: #c7d1c5 !important;
+}
+
+.has-border-tangerine-color {
+    border-color: #ce8e00 !important;
+}
+
+.has-border-color-navy-blue {
+    border-color: #2B2D41 !important;
+}
+
+.has-border-color-money-green {
+    border-color: #14892C !important;
+}
+
+.has-border-color-true-blue {
+    border-color: #0052CC !important;
+}

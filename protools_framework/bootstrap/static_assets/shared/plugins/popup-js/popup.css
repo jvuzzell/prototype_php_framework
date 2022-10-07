@@ -1,0 +1,34 @@
+.popup-containers {
+    position: fixed;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 3;
+    transform: translateY(0%);
+    transition: all 225ms ease-in-out;
+}
+
+body:not([data-popup="active"]) .popup-containers {
+    transform: translateY(-100%);
+}
+
+.popup-container[data-popup-target] {
+    width: 600px; 
+    position: fixed; 
+    top: 30px;
+    left: calc(50% - 300px);
+}
+
+.popup-container[data-popup-target][data-popup-container="hidden"] {
+    top: -1000px;
+}
+
+.popup-container .v-col {
+    margin-bottom: 12px;
+}
+
+.popup-container label + input[disabled] {
+    padding-top: 0; 
+    padding-bottom: 0;
+}

@@ -1,0 +1,74 @@
+/* Buttons */
+ 
+button,
+[class*="btn"], 
+[class*="button"] {
+    padding: 7px 18px;
+    white-space: nowrap;
+}
+
+button > *, 
+[class*="btn"] > *, 
+[class*="button"] > * {
+  pointer-events: none;
+}
+
+button + button {
+     margin-left: 5px; 
+}
+
+.btn-orange {
+    font-size: 18px;
+    color: white;
+    padding: 7px 18px;
+    box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.15);
+    background-color: #e05206;
+    border-radius: 5px;
+}
+
+.btn-deep-blue {
+    font-size: 18px;
+    color: white;
+    padding: 7px 18px;
+    box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.15);
+    background-color: #2B2D41;
+    border-radius: 5px;
+}
+
+.btn-orange:hover, 
+.btn-deep-blue:hover {
+    color: #fff;
+}
+
+.btn-white:hover {
+    background-color: #F3F6F9; 
+}
+
+.btn-no-background {
+    padding: 0; 
+}
+
+.btn-small-padding {
+    font-size: 14px;
+    padding: 5px 10px; 
+}
+
+button.btn-no-background + button {
+    margin-left: 20px; 
+}
+
+.btn-no-background:hover {
+    text-decoration: underline;
+}
+
+/* We're being asked to not outline buttons. These are an aesthetic decision.  */
+button:focus{
+    outline: 0px;
+}
+
+/* However, we can still force the outline on buttons that benefit from :focus outlines. */
+[class*="btn"]:focus,
+[class*="button"]:focus,
+.navbar-nav > button:focus {
+    outline: 2px solid #e05206;
+}

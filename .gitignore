@@ -9,3 +9,6 @@ tests/results/*
 tests/test-results/*
 .phpunit.result.cache
 environment_variables/
+.vscode
+.idea
+tmp/

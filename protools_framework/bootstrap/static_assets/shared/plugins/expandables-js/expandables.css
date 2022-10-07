@@ -1,0 +1,31 @@
+[data-expandable-container] [data-expandable-target] {
+    overflow: hidden;
+    transition: height 250ms ease-out;
+    height: auto;
+}
+
+[data-expandable-container] [data-expandable-trigger] {
+    transition: all 25ms ease-out;
+    transform: rotate(0);
+}
+
+[data-expandable-container="expanded"] [data-expandable-trigger] {
+    transform: rotate(90deg);
+}
+
+/* media-quries */
+@media (max-width: 639.98px) {
+    [data-expandable-container] [data-expandable-target] {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}
+
+@media (min-width: 640px) and (max-width: 1279.98px) {
+    [data-expandable-container] [data-expandable-target] {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}

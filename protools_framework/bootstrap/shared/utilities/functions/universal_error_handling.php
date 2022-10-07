@@ -31,11 +31,11 @@ function universal_exception_handler( $exception ) {
     );
 
     if ( ! defined( 'IS_CLI' ) ) {
-        Api_response::print_stderr( 404, $exception_response, 'dev' );
+        Api_response::print_stderr( $exception_response, 'dev' );
     }
     
     if( IS_CLI ) {
-        Api_response::print_stderr( 404, $exception_response, ENV_NAME );
+        Api_response::print_stderr( $exception_response, ENV_NAME );
     } else {
         Api_response::route_to_custom_page( 404, $exception_response, ERROR_PAGE, ENV_NAME ); 
     } 
@@ -60,7 +60,7 @@ function check_for_fatal() {
     $error = error_get_last();
 
     if ( isset( $error["type"] ) && $error["type"] == E_ERROR ) {
-        log_error( $error["type"], $error["message"], $error["file"], $error["line"] );
+        trigger_error( $error["type"], $error["message"], $error["file"], $error["line"] );
     }
 
 }

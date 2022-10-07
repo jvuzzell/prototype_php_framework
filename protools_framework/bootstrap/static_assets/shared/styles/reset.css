@@ -1,0 +1,245 @@
+/**
+ * Resets 
+ */
+
+*, *::before, *::after {
+    padding: 0;
+    margin: 0;
+    line-height: inherit;
+    text-decoration: inherit;
+    letter-spacing: inherit;
+    font-family: inherit;
+    font-weight: inherit;
+    font-style: inherit;
+    font-size: inherit;
+    color: inherit;
+    box-sizing: border-box;
+}
+
+html {
+    height: 100%;
+    -webkit-text-size-adjust: none;
+    -ms-text-size-adjust: none;
+    text-size-adjust: none;
+}
+
+body {
+    overflow-x: hidden;
+    overflow-y: scroll;
+    min-width: 320px;
+    height: 100%;
+    font-family: 'Roboto', Helvetica, Arial, sans-serif;
+    text-align: left;
+    font-weight: normal;
+    font-style: normal;
+    color: #2B2D41;
+}
+
+article, aside, figcaption, figure, footer, header, hgroup, main, nav, section {
+    display: block;
+}
+
+/* Hide focus outline for mouse users */
+
+body[data-mouse-active] :focus:not(input):not(textarea):not(select) {
+  outline: none;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+ol,
+ul,
+dl,
+pre,
+img,
+main,
+form,
+table,
+input,
+label,
+audio,
+video,
+select,
+figure,
+canvas,
+output,
+address,
+h-scroll,
+textarea,
+fieldset,
+blockquote {
+  display: block;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+ol,
+ul,
+dl,
+li,
+pre,
+hr,
+img,
+form,
+table,
+audio,
+video,
+figure,
+canvas,
+output,
+address,
+h-scroll,
+fieldset,
+blockquote {
+  margin-bottom: 16px;
+}
+
+@media (min-width: 960px) {
+
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  ol,
+  ul,
+  dl,
+  li,
+  pre,
+  hr,
+  img,
+  form,
+  table,
+  audio,
+  video,
+  figure,
+  canvas,
+  output,
+  address,
+  h-scroll,
+  fieldset,
+  blockquote {
+    margin-bottom: 20px;
+  }
+
+}
+
+p:last-child,
+h1:last-child,
+h2:last-child,
+h3:last-child,
+h4:last-child,
+h5:last-child,
+h6:last-child,
+ol:last-child,
+ul:last-child,
+dl:last-child,
+li:last-child,
+pre:last-child,
+hr:last-child,
+img:last-child,
+form:last-child,
+table:last-child,
+label:last-child,
+input:last-child,
+audio:last-child,
+video:last-child,
+select:last-child,
+figure:last-child,
+canvas:last-child,
+output:last-child,
+address:last-child,
+h-scroll:last-child,
+fieldset:last-child,
+textarea:last-child,
+blockquote:last-child {
+  margin-bottom: 0;
+}
+
+hr {
+  width: 100%;
+  height: 1px;
+  background-color: #9c9ea1;
+  border: none;
+}
+
+img {
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  border: none;
+}
+
+figure.cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+figure.cover.compatible {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+video {
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  border: 1px solid #9c9ea1;
+  cursor: pointer;
+}
+
+button,
+input[type="button"],
+input[type="submit"] {
+  text-align: left;
+  background: transparent;
+  border: none;
+}
+
+button:not([disabled]),
+input[type="button"]:not([disabled]),
+input[type="submit"]:not([disabled]) {
+  cursor: pointer;
+}
+
+button:active,
+input[type="button"]:active,
+input[type="submit"]:active {
+  color: inherit;
+}
+
+[hidden] {
+  display: none;
+}
+
+.zebra {
+  padding-left: 0;
+  list-style: none;
+}
+
+.zebra li,
+.zebra dd {
+  padding-top: 15px;
+  padding-bottom: 15px;
+  padding-left: 15px;
+  margin: 0;
+}
+
+.zebra li:nth-child(odd),
+.zebra dd:nth-child(odd) {
+  background-color: #f4f4f4;
+}

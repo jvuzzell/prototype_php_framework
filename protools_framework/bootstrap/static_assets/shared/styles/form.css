@@ -1,0 +1,187 @@
+/* Form */
+
+form [class*="success"] {
+  color: #126b37;
+}
+
+form label {
+  margin-bottom: 10px;
+}
+
+form input[type="radio"],
+form input[type="radio"] + label {
+  display: inline-block;
+}
+
+form input[type="radio"] + label {
+  padding-left: 5px;
+  padding-right: 20px;
+}
+
+form select,
+form textarea,
+form input:not([type="radio"]),
+form input:not([type="checkbox"]), 
+form input:not([type="submit"]), 
+form input:not([type="reset"]) {
+  width: 100%;
+  border: 0;
+  display: inline-block;
+}
+
+form select,
+form textarea,
+form input {
+    background-color: #F0F3F6;
+    border-radius: 5px;
+    padding: 7px 10px;
+    background-clip: padding-box;
+    border: 1px solid #ced4da !important;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+form select[disabled],
+form textarea[disabled],
+form input[disabled] {
+  border: none!important;
+}
+
+form select:not([class*="has-color"]), 
+form textarea:not([class*="has-color"]), 
+form input:not([class*="has-color"]),
+form input:not([type="submit"]), 
+form input:not([type="reset"]) {
+    color: #495057;
+}
+
+form input[type="search"] {
+  outline-offset: -2px;
+  -webkit-appearance: none;
+}
+
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+}
+
+form select {
+  line-height: 40px;
+  margin-bottom: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  vertical-align: top;
+  background-image: url(https://shapkit.shapiro.com/universal-assets/icons/custom/caret-down.svg);
+  background-repeat: no-repeat;
+  background-size: 10px 10px;
+  background-position: calc(100% - 10px) calc(100% * 0.5);
+}
+
+form select::-ms-expand {
+    display: none;
+}
+
+form .error input,
+form .error select,
+form .error textarea {
+  border-color: #e54424;
+}
+
+form .error input,
+form .error select {
+  margin-bottom: 10px;
+}
+
+form .error ul {
+  padding-left: 0;
+}
+
+form .error li {
+  margin-bottom: 5px;
+  margin-left: 0;
+  padding-left: 1.5em;
+  list-style: none;
+  color: #e54424;
+}
+
+form .error li::before {
+  background-image: url(/images/icons/alert-red-icon.svg);
+  display: inline-block;
+  vertical-align: middle;
+  position: relative;
+  top: -0.2em;
+  width: 1em;
+  height: 1em;
+  margin-left: -1.5em;
+  margin-right: 0.5em;
+  content: "";
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+form label.required::after {
+  margin-left: 2px;
+  color: #e54424;
+  content: '*';
+}
+
+form label.inline-block, 
+form label.inline-block + input, 
+form label.inline-block + select,
+form label.inline-block + textarea {
+    display: inline-block;
+    width: auto !important; 
+}
+
+form select[disabled], 
+form textarea[disabled], 
+form input[disabled] {
+    background-color: #FFF;
+    border: none;
+    padding-left: 0; 
+    padding-right: 0;
+    color: #2B2D41;
+}
+
+::placeholder {
+    color: #2B2D41;    
+}
+
+:focus {
+  outline: 2px solid #e05206;
+}
+
+fieldset {
+  padding: 20px;
+}
+
+label,
+label + input[type="radio"], 
+label + input[type="checkbox"] {
+  display: inline-block;
+}
+
+label + input[type="radio"], 
+label + input[type="checkbox"] {
+   float: left;
+   margin-right: 10px;
+   height: 22px;
+   width: auto; 
+}
+
+form input[type="submit"],
+form input[type="reset"] {
+    font-size: 18px;
+    color: white;
+    padding: 7px 18px;
+    box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.15);
+    background-color: #e05206;
+    border-radius: 5px;
+    text-align: center;
+    width: auto !important;
+}
+
+form input[type="submit"]:hover {
+    background-color: white; 
+    color: #e05206; 
+}

@@ -1,0 +1,36 @@
+/**
+ * Layout
+ */
+
+main-content, 
+content-wrapper, 
+content-grid, 
+h-row, 
+v-col { 
+    display: block; 
+}
+
+/**
+ * Modules
+ */
+
+main-container, 
+flyout-container,
+flyout-containers, 
+sidebar-nav,
+sidebar-trigger,
+utility-nav, 
+quick-stat, 
+expandable-tab, 
+tabular-list, 
+tabular-header, 
+column-header, 
+app-header, 
+tabulator-table,
+generic-report,
+generic-filter, 
+screen-overlay
+{
+    display: block;
+    width: 100%;
+}

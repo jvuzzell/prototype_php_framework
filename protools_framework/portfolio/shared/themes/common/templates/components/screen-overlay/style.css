@@ -1,0 +1,15 @@
+.screen-overlay {
+    background-color: rgba(0,0,0,0.45);
+    position: fixed;
+    width: 100%; 
+    height: 100%;
+    top: 0; 
+    left: 0;
+    z-index: 2;
+    transform: translateX(0);
+}
+
+body:not([data-overlay="active"]) .screen-overlay {
+    background-color: rgba(0,0,0,0.0);
+    transform: translateX(-100%);
+}

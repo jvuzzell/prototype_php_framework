@@ -6,25 +6,13 @@ use \Dump_var;
 
 /** 
  * @package Standard_api_response
- * @version 1.0
- * 
  * @author Joshua Uzzell 
- *
- * Purpose: 
- * Post a JSON message with HTTP Status codes in the header
+ * @since 2019
  * 
- * Private Methods 
- * 
- *  @method set_http_response_code
- *  @method set_response
- *  @method response_helper
- * 
- * Public Methods
- * 
- *  @method print_json_to_screen
- *  @method route_to_custom_page
- *  @method print_stderr 
- *  @method get_response
+ * @method print_json_to_screen
+ * @method route_to_custom_page
+ * @method print_stderr 
+ * @method get_response
  * 
  */
 
@@ -126,7 +114,11 @@ class Api_response {
 
         // @todo In the future if an API response is private, we need to make sure 
         //       that it is logged/emailed with all attributes
-        if( $args[ 'system' ][ 'private' ] === false ) {
+    
+        if( 
+            $args[ 'system' ][ 'private' ] === false ||
+            $environment === 'dev'
+        ) {
 
             $api_response = $args;
 
@@ -258,7 +250,7 @@ class Api_response {
      * Print Stderr
      */
 
-    Public static function print_stderr( int $response_code, array $response_data, string $environment = 'prod' ) {
+    Public static function print_stderr( array $response_data, string $environment = 'prod' ) {
 
         // Add defaults for Standardized API Response
         $response_data = self::set_response( $response_data, $environment );
@@ -266,7 +258,7 @@ class Api_response {
         // Print JSON to screen
         fwrite( STDERR, self::encode_response( $response_data, __FUNCTION__ ) );
 
-        return true;
+        exit;
     }
 
     /**
@@ -281,9 +273,39 @@ class Api_response {
 
     /** 
      * API response helper
+     * 
+     * Standardized format for responding to HTTP requests or internal API
+     * 
+     * @param array $args = [
+     *      'error'       => true, // (boolean) Denotes whether error occurred
+     *      'issue_id'    => '', // (string) unique identifier within entire application
+     *      'message'     => '', // (string) 
+     *      'data'        => array(), // (string) An array based on another computation
+     *      'status'      => 500, // (int) HTTP status used in response header 
+     *      'log'         => false, // (boolean) Should this information should be logged
+     *      'private'     => true, // (boolean) Should the error information can be seen in production
+     *      'continue'    => true, // (boolean) Should this program keep running if it encounters an error
+     *      'email'       => false, // (boolean) Should an email alert be triggered
+     *      'source'      => get_class() // (boolean) Class, function, or file name containing this information
+     * ]
+     * 
+     * @return array [
+     *      'status' => 500, // (int) HTTP status used in response header 
+     *      'error'  => true, // (boolean) Denotes whether error occurred
+     *      'system' => [
+     *          'issue_id' => '', // (string) unique identifier within entire application
+     *          'log'      => false, // (boolean) Should this information should be logged
+     *          'private'  => true, // (boolean) Should the error information can be seen in production
+     *          'continue' => true, // (boolean) Should this program keep running if it encounters an error
+     *          'email'    => false // (boolean) Should an email alert be triggered
+     *      ],
+     *      'source'  => '', // (boolean) Class, function, or file name containing this information
+     *      'message' => '', // (string) Friendly description of the outcome
+     *      'data' => [] // (mixed) Payload
+     * ]
      */
 
-    Private static function response_helper( $args = array() ) {
+    Private static function response_helper( $args = array() ) : array {
 
         $default_args = array(
             'error'       => true,
@@ -317,7 +339,41 @@ class Api_response {
         
     }
 
-    Public static function get_response( $args = array() ) {
+    /**
+     * Get response 
+     * 
+     * Alias for response_helper()
+     * 
+     * @param array $args = [
+     *      'error'       : true, // (boolean) Denotes whether error occurred
+     *      'issue_id'    : '', // (string) unique identifier within entire application
+     *      'message'     : '', // (string) 
+     *      'data'        : array(), // (string) An array based on another computation
+     *      'status'      : 500, // (int) HTTP status used in response header 
+     *      'log'         : false, // (boolean) Should this information should be logged
+     *      'private'     : true, // (boolean) Should the error information can be seen in production
+     *      'continue'    : true, // (boolean) Should this program keep running if it encounters an error
+     *      'email'       : false, // (boolean) Should an email alert be triggered
+     *      'source'      : get_class() // (boolean) Class, function, or file name containing this information
+     * ]
+     * 
+     * @return array [
+     *      'status' : 500, // (int) HTTP status used in response header 
+     *      'error'  : true, // (boolean) Denotes whether error occurred
+     *      'system' : [
+     *          'issue_id' : '', // (string) unique identifier within entire application
+     *          'log'      : false, // (boolean) Should this information should be logged
+     *          'private'  : true, // (boolean) Should the error information can be seen in production
+     *          'continue' : true, // (boolean) Should this program keep running if it encounters an error
+     *          'email'    : false // (boolean) Should an email alert be triggered
+     *      ],
+     *      'source'  : '', // (boolean) Class, function, or file name containing this information
+     *      'message'  :'', // (string) Friendly description of the outcome
+     *      'data' : [] // (mixed) Payload
+     * ]
+     */
+
+    Public static function get_response( $args ) : array {
 
         return self::response_helper( $args );
 
