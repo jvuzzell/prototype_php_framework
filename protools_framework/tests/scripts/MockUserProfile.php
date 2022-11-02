@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Scripts\Zubair;
+namespace Tests\Scripts;
 
 use InvalidArgumentException;
 
-class User
+class MockUserProfile
 {
     public int $age;
     public array $favorite_movies = [];

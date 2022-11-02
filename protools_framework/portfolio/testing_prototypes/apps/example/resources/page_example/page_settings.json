@@ -1,0 +1,4 @@
+{
+    "theme" : "common",
+    "template" : "sample_template/template.html.twig"
+}

@@ -1,0 +1,27 @@
+{
+    "id" : "SPR-02",
+    "plan_id" : "PI-22-04",
+    "name" : "All Features During Sprint 02",
+    "description" : "Iteration goals go here to describe high-level business and technical goals that the Agile Team agreeds to accomplish durin this Iteration.",
+    "status" : "active development",
+    "test_scripts" : {
+        "TASK-58_UserProfileTest" : {
+            "test_type" : "phpunit",
+            "description" : "Zubair Tests",
+            "id" : "STORY-23",
+            "script_location" : "STORY_23/TASK-58_UserProfileTest.php"
+        },
+        "STORY-13_Dir" : {
+            "test_type" : "phpunit",
+            "description" : "Examples of PHPUnit processing a directory",
+            "id" : "STORY-13",
+            "script_location" : "STORY_13/"
+        }, 
+        "STORY-23" : {
+            "test_type" : "phpunit",
+            "description" : "Zubair Tests",
+            "id" : "STORY-23",
+            "script_location" : "STORY_23/"
+        }
+    }
+}

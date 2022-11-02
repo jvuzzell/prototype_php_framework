@@ -1,21 +1,19 @@
 <?php
  
-namespace Tests\Scripts\Nickturner_Demo;
+namespace Tests\Scripts\Story_13;
 
 use PHPUnit\Framework\TestCase;
 
 class SkippedTest extends TestCase  {
-    private function testSetUp() {
+    protected function setUp() :void {
         $this->markTestSkipped('All tests are marked as skipped.');
     }
 
-    public function testPassed() {
+    public function testThisTestPassedButShouldBeSkipped() {
         $this->assertEquals(1, 1, 'This test should not fail!');
     }
 
-    public function testFailed() {
+    public function testThisTestFailedButShouldBeSkipped() {
         $this->assertEquals(1, 0, 'This test is meant to fail!');
     }
 }
-
-?>

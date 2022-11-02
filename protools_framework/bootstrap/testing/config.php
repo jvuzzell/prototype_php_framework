@@ -1,6 +1,7 @@
 <?php 
 
-// @TODO Exit if accessed directly 
+require_once( __DIR__ . '/../../../vendor/autoload.php' );
+require_once( __DIR__ . '/../../autoload.php' );
 
 /**
  * Global File Paths
@@ -18,8 +19,19 @@ if ( !defined( 'SHARED_LIBRARY_DIR' ) ) {
     define( 'SHARED_LIBRARY_DIR', __DIR__ . '/../shared' );
 }
 
-require_once( __DIR__ . '/../../../vendor/autoload.php' );
-require_once( __DIR__ . '/../../autoload.php' );
+require_once( SHARED_LIBRARY_DIR . '/utilities/functions/universal_error_handling.php' );
+require_once( SHARED_LIBRARY_DIR . '/utilities/classes/static/Dump_var.php' );
+
+/**
+ * Import classes
+ */
+
+use Bootstrap\Shared\Utilities\Classes\Api_response as Api_response;
+use Bootstrap\Shared\Utilities\Classes\Curl_client as Curl_client; 
+use Bootstrap\Shared\Utilities\Classes\Database_pdo_client as Database_pdo_client;
+use Bootstrap\Shared\Utilities\Classes\Directory_search as Directory_search;
+use Bootstrap\Shared\Utilities\Classes\Environment_configuration;
+use Bootstrap\Shared\Utilities\Classes\Json_validator as Json_validator;
 
 /**
  * Encryption classes
@@ -32,22 +44,6 @@ if( ! defined( 'ENCRYPT_KEY' ) ) {
 if( ! defined( 'ENCRYPT_NONCE' ) ) {
     define( 'ENCRYPT_NONCE', \Sodium\randombytes_buf( \Sodium\CRYPTO_SECRETBOX_KEYBYTES ) );
 }
-
-/**
- * Import classes
- */
-
-use Bootstrap\Shared\Utilities\Classes\Static\Response_helper as Response_helper;
-use Bootstrap\Shared\Utilities\Classes\Api_response as Api_response;
-use Bootstrap\Shared\Utilities\Classes\Curl_client as Curl_client; 
-use Bootstrap\Shared\Utilities\Classes\Database_pdo_client as Database_pdo_client;
-use Bootstrap\Shared\Utilities\Classes\Directory_search as Directory_search;
-use Bootstrap\Shared\Utilities\Classes\Json_validator as Json_validator;
-use Sodium\crypto_secretbox;
-use Sodium\crypto_secretbox_open;
-
-require_once( SHARED_LIBRARY_DIR . '/utilities/functions/universal_error_handling.php' );
-require_once( SHARED_LIBRARY_DIR . '/utilities/classes/static/Dump_var.php' );
 
 /**
  * Instantiate Global Utilities
@@ -79,8 +75,7 @@ $env_args = array(
         // environment_config will attemtpt to detect client config in data source 
         // file based on array key, otherwise it will create a class with the same name as the key
         'curl' => array(
-            'protools_api' => new Curl_client, 
-            'atlassian_rest_api'  => new Curl_client
+            'protools_api' => new Curl_client
         ), 
         'databases' => array(
             'cms_database' => new Database_pdo_client 
@@ -89,46 +84,22 @@ $env_args = array(
     )
 ); 
 
-$Environment_config = new Bootstrap\Shared\Utilities\Classes\Environment_configuration( $env_args );
-
-if( ! defined( 'ENV_NAME' ) ) {
-    define( 'ENV_NAME', $Environment_config->get_env_config()[ 'env_name' ] );
-}
-
-/**
- * Validate clients
- */
-
-check_client_error( $Environment_config, 'protools_api' );
-check_client_error( $Environment_config, 'atlassian_rest_api' );
-check_client_error( $Environment_config, 'cms_database' );
-
-function check_client_error( $Environment_config, $client_name ) {
-
-    if( $Environment_config->get_client( $client_name )[ 'error' ] ) { 
-
-        $env_config_client_response = $Environment_config->get_client( $client_name ); 
-    
-        if( IS_CLI ) {
-            Api_response::print_json( $env_config_client_response[ 'status' ], $env_config_client_response, ENV_NAME );
-        } else {
-            Api_response::route_to_custom_page( $env_config_client_response[ 'status' ], $env_config_client_response, ERROR_PAGE, ENV_NAME );
-        }
-    
-    } 
-
-}
-
-$_SERVER[ 'REQUEST_SCHEME' ] = $Environment_config->get_request_protocol();
-$environment_folders = $Environment_config->get_env_config()[ 'directories' ]; 
-
-/**
- * Configure Site Paths and URLs
- */
+$Environment_config = new Environment_configuration( $env_args );
 
 if ( ! defined( 'IS_CLI' ) ) {
     define( 'IS_CLI', $Environment_config->get_is_cli() );
 }
+
+if( ! defined( 'ENV_VAR' ) ) { 
+    define( 'ENV_VAR', $Environment_config->get_env_variables() );
+}
+
+if( ! defined( 'ENV_NAME' ) ) {
+    define( 'ENV_NAME', ENV_VAR[ 'env_name' ] );
+}
+
+$_SERVER[ 'REQUEST_SCHEME' ] = $Environment_config->get_request_protocol();
+$environment_folders = ENV_VAR[ 'directories' ]; 
 
 if( !IS_CLI ) {
 
@@ -150,6 +121,36 @@ if( !IS_CLI ) {
 
 }
 
+/**
+ * Validate clients
+ */
+
+check_client_error( $Environment_config, 'protools_api' );
+check_client_error( $Environment_config, 'cms_database' );
+
+function check_client_error( $Environment_config, $client_name ) {
+
+    $client_response = $Environment_config->get_client( $client_name ); 
+
+    if( $client_response[ 'error' ] ) { 
+    
+        if( IS_CLI ) {
+            Api_response::print_json( $client_response[ 'status' ], $client_response, ENV_NAME );
+        } else {
+            Api_response::route_to_custom_page( $client_response[ 'status' ], $client_response, ERROR_PAGE, ENV_NAME );
+        }
+    
+    } 
+
+}
+
+// $Environment_config->set_clients(array(
+//     'curl' => array(
+//         'atlassian_rest_api' => new Curl_client
+//     )
+// ));
+// check_client_error( $Environment_config, 'atlassian_rest_api' );
+//
 // $Atlassian_rest_api = $Environment_config->get_client( 'atlassian_rest_api' )[ 'data' ][ 'class' ]; 
 // $atlassian_response = $Atlassian_rest_api->execute(
 //     array( 

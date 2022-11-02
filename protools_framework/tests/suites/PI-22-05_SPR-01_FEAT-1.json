@@ -1,0 +1,15 @@
+{
+    "id" : "SPR-01",
+    "plan_id" : "PI-22-05",
+    "name" : "Feature 1 - Zubair Test",
+    "description" : "Iteration goals for a specific feature, Zubair Test https://github.com/Zubs/php-testing/blob/master/tests/UserTest.php",
+    "status" : "active development",
+    "test_scripts" : {
+        "STORY-23" : {
+            "test_type" : "phpunit",
+            "description" : "Zubair Tests",
+            "id" : "STORY-23",
+            "script_location" : "STORY_23/"
+        }
+    }
+}

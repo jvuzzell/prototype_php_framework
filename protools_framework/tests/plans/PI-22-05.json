@@ -1,0 +1,14 @@
+{
+    "name" : "Theme of Program Increment - PI-22-04", 
+    "description" : "PI (Program Increment) Objectives can be expressed in area to discuss the business value that teams are looking to achieve during the next iterations.", 
+    "id" : "PI-22-05",
+    "start-date" : "yy-mm-dd", 
+    "end-date" : "yy-mm-dd",
+    "code" : [ 
+        "protools_framework" 
+    ],
+    "test_suites" : [
+        "PI-22-05_SPR-01_FEAT-1", 
+        "PI-22-05_SPR-02_FEAT-2_Dir"
+    ]
+}

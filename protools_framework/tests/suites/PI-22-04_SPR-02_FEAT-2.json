@@ -1,36 +1,39 @@
 {
-    "name" : "Nick Turner PHP Unit Demo",
-    "description" : "https://github.com/nickturner/PHPUnit_Html",
+    "id" : "SPR-02",   
+    "plan_id" : "PI-22-04",
+    "name" : "FEAT-1 - Nick Turner Test",
+    "description" : "Iteration goals for a specific feature, Nick Turner Test https://github.com/nickturner/PHPUnit_Html",
+    "status" : "active development",
     "test_scripts" : {
         "DeprecatedTest" : {
             "test_type" : "phpunit",
             "description" : "Examples of deprecated tests",
-            "script_location" : "nickturner_demo/DeprecatedTest.php"
+            "script_location" : "STORY_13/JIRA_51_TestPHPUnitDeprecatedAssertionsTest.php"
         }, 
         "ExceptionTest" : {
             "test_type" : "phpunit",
             "description" : "Examples of tests that throw exceptions",
-            "script_location" : "nickturner_demo/ExceptionTest.php"
+            "script_location" : "STORY_13/ExceptionTest.php"
         }, 
         "FailedTest" : {
             "test_type" : "phpunit",
             "description" : "Examples of tests that failed their testss",
-            "script_location" : "nickturner_demo/FailedTest.php"
+            "script_location" : "STORY_13/FailedTest.php"
         },
         "IncompleteTest" : {
             "test_type" : "phpunit",
             "description" : "Examples of incomplete tests",
-            "script_location" : "nickturner_demo/IncompleteTest.php"
+            "script_location" : "STORY_13/IncompleteTest.php"
         },
         "PassedTest" : {
             "test_type" : "phpunit",
             "description" : "Examples of tests that pass their tests",
-            "script_location" : "nickturner_demo/PassedTest.php"
+            "script_location" : "STORY_13/PassedTest.php"
         },
         "SkippedTest" : {
             "test_type" : "phpunit",
             "description" : "Examples of skipped tests",
-            "script_location" : "nickturner_demo/SkippedTest.php"
+            "script_location" : "STORY_13/SkippedTest.php"
         }
     }
 }

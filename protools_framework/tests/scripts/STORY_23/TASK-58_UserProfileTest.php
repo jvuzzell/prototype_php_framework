@@ -1,11 +1,13 @@
 <?php
 
-namespace Tests\Scripts\Zubair;
+namespace Tests\Scripts;
 
 use PHPUnit\Framework\TestCase;
+use Tests\Scripts\MockUserProfile as User;
 
-final class UserTest extends TestCase
+final class UserProfileTest extends TestCase
 {
+
     public function testClassConstructor()
     {
         $user = new User(18, 'John');
@@ -13,6 +15,12 @@ final class UserTest extends TestCase
         $this->assertSame('John', $user->name);
         $this->assertSame(18, $user->age);
         $this->assertEmpty($user->favorite_movies);
+    }
+
+    private function testThisIsATest() {
+        $user = new User(18, 'John');
+
+        $this->assertSame('John', $user->name);
     }
 
     public function testTellName()
