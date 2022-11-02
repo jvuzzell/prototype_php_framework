@@ -30,6 +30,7 @@ class Asset_whitelist_registration {
      */
 
     PUBLIC function register_whitelist( $whitelist ) {
+        
         foreach( $whitelist as $asset_type ) {  
 
             $asset_dir = $asset_type[ 'directory' ];

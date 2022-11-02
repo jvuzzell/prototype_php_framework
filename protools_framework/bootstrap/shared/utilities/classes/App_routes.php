@@ -21,30 +21,30 @@ class App_routes {
 
     Public function get_view() {
 
-        $requested_module = $this->app_path[ 'module' ]; 
+        $requested_resource = $this->app_path[ 'resource' ]; 
         $requested_view = $this->app_path[ 'view' ];
 
         if( 
-            isset( $this->routes[ $this->app_path[ 'application' ] ][ 'modules' ] ) && 
-            array_key_exists( $requested_module, $this->routes[ $this->app_path[ 'application' ] ][ 'modules' ] )
+            isset( $this->routes[ $this->app_path[ 'application' ] ][ 'resources' ] ) && 
+            array_key_exists( $requested_resource, $this->routes[ $this->app_path[ 'application' ] ][ 'resources' ] )
          ) {
 
-            $modules = $this->routes[ $this->app_path[ 'application' ] ][ 'modules' ]; 
-            $module = $modules[ $requested_module ]; 
+            $resources = $this->routes[ $this->app_path[ 'application' ] ][ 'resources' ]; 
+            $resource = $resources[ $requested_resource ]; 
 
             if( 
-                isset( $module[ 'views' ] ) && 
-                array_key_exists( $requested_view, $module[ 'views' ] ) 
+                isset( $resource[ 'views' ] ) && 
+                array_key_exists( $requested_view, $resource[ 'views' ] ) 
             ) {
 
-                $views = $module[ 'views' ];
+                $views = $resource[ 'views' ];
                 $view = $views[ $requested_view ];
     
                 $response = $this->Response->get_response([
                     'status' => 200, 
                     'error' => false,
                     'issue_id' => 'app_routes_003',
-                    'message' => 'Module found', 
+                    'message' => 'Resource found', 
                     'source' => get_class(), 
                     'data' => array( 'view_path' => $view )
                 ]);
@@ -65,7 +65,7 @@ class App_routes {
             $response = $this->Response->get_response([
                 'status' => 404,
                 'issue_id' => 'app_routes_004',
-                'message' => 'Module not found', 
+                'message' => 'Resource not found', 
                 'source' => get_class()
             ]);
 

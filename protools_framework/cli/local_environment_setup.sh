@@ -9,7 +9,7 @@ fi
 
 ramp.addhost prototypes $protools_framework_dir/bootstrap/sites/
 ramp.addhost testing.prototypes $protools_framework_dir/bootstrap/testing/
-ramp.addhost api.prototypes $protools_framework_dir/bootstrap/api-gateway/
+ramp.addhost api.prototypes $protools_framework_dir/bootstrap/api_gateway/
 ramp.addhost assets.prototypes $protools_framework_dir/bootstrap/assets/
 ramp.addhost builder.prototypes $protools_framework_dir/bootstrap/sites/
 ramp.addhost cms.prototypes $protools_framework_dir/bootstrap/sites/

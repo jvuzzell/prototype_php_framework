@@ -13,11 +13,11 @@ use \DateTimeZone;
  * @author Joshua Uzzell 
  *
  * Purpose: 
- * Detects environment variables including file paths to modules, applications, and views 
+ * Detects environment variables including file paths to resources, applications, and views 
  * Additionally, this class instantiates database and API clients
  *  
  * Public Methods: 
- *      @method get_env_config
+ *      @method get_env_variables
  *      @method get_request_protocols
  *      @method get_project_root_directory
  *      @method get_site_directory
@@ -34,7 +34,6 @@ use \DateTimeZone;
  *      @method set_domain
  *      @method get_app_path
  *      @method is_cli
- *      @method get_cli_arg_context
  *      @method parse_path_for_params
  *      @method set_curl_client_config
  *      @method set_db_client_config
@@ -43,21 +42,47 @@ use \DateTimeZone;
 
 class Environment_configuration {
 
-    Private $directory_search = null; // Resource
-    Private $get_response = null; // String
-    Private $Curl_client = null; // Resource
-    Private $Pdo_client = null; // Resource
+    Private $Directory_search = null; // Resource
+    Private $Api_response = null; // String
+    Private $encrypt; // (String) method name
+    Private $decrypt; // (String) method name
 
     Private $key = ''; 
     Private $nonce = '';
-    Private $env_config = array();
+    Private $env_config = array(
+        'is_cli' => '',
+        'env_name' => '',
+        'request_protocol' => '',
+        'view' => array(
+            'route' => ''
+        ),
+        'app_path' => array(
+            'domain' => '', 
+            'application' => '', 
+            'resource' => '', 
+            'view' => ''
+        ),
+        'request' => array(
+            'method' => '', 
+            'data' => array()
+        ),
+        'env_domains' => array(
+            'main_site' => '', 
+            'static_assets' => '',
+            'testing' => '', 
+            'builder' => '', 
+            'cms' => '', 
+            'api' => ''
+        ),
+        'directories' => array()
+    );
     Private $env_var_path = '';
 
     Private $expected_params = array(
         'domain',
         'application', 
-        'module', 
-        'view'
+        'resource', 
+        'view', 
     );
 
     Private $program_directories_structure = array(
@@ -98,7 +123,8 @@ class Environment_configuration {
         $domain = $this->set_domain(); 
         $app_path = $this->get_app_path();
         $request_protocol = ( $is_cli ) ? null : $this->set_request_protocol();
-        
+        $request_parameters = $this->get_request_params();
+
         $full_domain_arr = explode( '.', $domain );
         array_pop( $full_domain_arr ); // Remove TLD
         $domain_name = implode( '.', $full_domain_arr );
@@ -109,14 +135,14 @@ class Environment_configuration {
         if( $env_var_path_response[ 'error' ] ) {
             throw new Exception( $env_var_path_response[ 'message' ] );
         } else {
-            $this->get_env_var_path = $env_var_path_response[ 'data' ][ 'filepath' ];
+            $this->env_var_path = $env_var_path_response[ 'data' ][ 'filepath' ];
         }
         
         // Set program root
-        $project_root_directory = realpath( $this->get_env_var_path . '/../' ); 
+        $this->project_root_directory = realpath( $this->env_var_path . '/../' ); 
 
         // Set site specific directories for Environment Variables, APIs, Assets, Testing, Themes, Portfolio
-        $program_directories_response = $this->get_program_directories( $project_root_directory, $domain_name );
+        $program_directories_response = $this->get_program_directories( $this->project_root_directory, $domain_name );
 
         if( $program_directories_response[ 'error' ] ) {
             throw new Exception( $program_directories_response[ 'message' ] );
@@ -125,7 +151,7 @@ class Environment_configuration {
         }
 
         // Get environment name
-        $env_domain_filename = $this->get_env_var_path . '/shared/env_domains.inc'; 
+        $env_domain_filename = $this->env_var_path . '/shared/env_domains.inc'; 
         $env_name_response = $this->get_env_name( $env_domain_filename, $domain );
         
         if( $env_name_response[ 'error' ] ) {
@@ -149,59 +175,64 @@ class Environment_configuration {
         if( $data_source_response[ 'error' ] ) {
             throw new Exception( $data_source_response[ 'message' ] );
         } else {
-            $data_sources = $data_source_response[ 'data' ]; 
+            $this->data_sources = $data_source_response[ 'data' ]; 
         }
         
         // Generate clients
         if ( isset( $args[ 'clients' ] ) && !empty( $args[ 'clients' ] ) ) {
 
             $clients = $args[ 'clients' ];
+            $this->set_clients( $clients );
 
-            // Instantiate Curl Clients
-            if ( isset( $clients[ 'curl' ] ) && !empty( $clients[ 'curl' ] ) ) {
+        }
 
-                $curl_clients = $clients[ 'curl' ]; 
+        // Final - Compile environment configuration
+        $this->env_config = array_merge( $this->env_config, array(
+            'is_cli' => $is_cli, 
+            'env_name' => $env_name,
+            'request_protocol' => $request_protocol,
+            'app_path' => $app_path,
+            'request' => $request_parameters,  
+            'env_domains' => $env_domains[ 'url' ],
+            'directories' => $program_directories
+        ));
 
-                foreach( $curl_clients as $client_key => $curl_client_class ) {
+    }
 
-                    // Validation
-                    if( !gettype( $curl_client_class ) === 'object' ) {
-                        throw new Exception( 'Curl Clients - unable to initialize client; cURL client object missing' );
-                    } 
+    /**
+     * @param $clients = array(
+     *      'curl' => array(
+     *          'client_name' => new Curl_client
+     *      ), 
+     *      'databases' => array(
+     *          'client_name' => new Database_pdo_client
+     *      ), 
+     *      'email' => array()
+     * )
+     */
 
-                    // Crossmatch
-                    if( isset( $data_sources[ 'curl' ][ $client_key ] ) ) {
-                        
-                        // Set client config
-                        $data_config = $data_sources[ 'curl' ][ $client_key ]; 
-                        $this->set_curl_client_config( $client_key, $data_config, $curl_client_class );
+    Public function set_clients( array $clients ) {
 
-                    }
+        $data_sources = $this->data_sources; 
 
-                }
+        // Instantiate Curl Clients
+        if ( isset( $clients[ 'curl' ] ) && !empty( $clients[ 'curl' ] ) ) {
 
-            }
+            $curl_clients = $clients[ 'curl' ]; 
 
-            // Instantiate Database Clients
-            if ( isset( $clients[ 'databases' ] ) && !empty( $clients[ 'databases' ] ) ) {
+            foreach( $curl_clients as $client_key => $curl_client_class ) {
+                // Dump_var::print( $client_key );
+                // Validation
+                if( !gettype( $curl_client_class ) === 'object' ) {
+                    throw new Exception( 'Curl Clients - unable to initialize client; cURL client object missing' );
+                } 
 
-                $database_clients = $clients[ 'databases' ]; 
-
-                foreach( $database_clients as $client_key => $db_client_class ) {
-
-                    // Validation
-                    if( !gettype( $db_client_class ) === 'object' ) {
-                        throw new Exception( 'Database Clients - unable to initialize client; database client object missing' );
-                    } 
+                // Crossmatch
+                if( isset( $data_sources[ 'curl' ][ $client_key ] ) ) {
                     
-                    // Crossmatch
-                    if( isset( $data_sources[ 'databases' ][ $client_key ] ) ) {
-
-                        // Set client config
-                        $data_config = $data_sources[ 'databases' ][ $client_key ]; 
-                        $this->set_db_client_config( $client_key, $data_config, $db_client_class );
-
-                    }
+                    // Set client config
+                    $data_config = $data_sources[ 'curl' ][ $client_key ]; 
+                    $this->set_curl_client_config( $client_key, $data_config, $curl_client_class );
 
                 }
 
@@ -209,15 +240,30 @@ class Environment_configuration {
 
         }
 
-        // Final - Compile environment configuration
-        $this->env_config = array(
-            'is_cli' => $is_cli, 
-            'env_name' => $env_name,
-            'request_protocol' => $request_protocol, 
-            'env_domains' => $env_domains[ 'url' ],
-            'app_path' => $app_path,
-            'directories' => $program_directories
-        );
+        // Instantiate Database Clients
+        if ( isset( $clients[ 'databases' ] ) && !empty( $clients[ 'databases' ] ) ) {
+
+            $database_clients = $clients[ 'databases' ]; 
+
+            foreach( $database_clients as $client_key => $db_client_class ) {
+
+                // Validation
+                if( !gettype( $db_client_class ) === 'object' ) {
+                    throw new Exception( 'Database Clients - unable to initialize client; database client object missing' );
+                } 
+                
+                // Crossmatch
+                if( isset( $data_sources[ 'databases' ][ $client_key ] ) ) {
+
+                    // Set client config
+                    $data_config = $data_sources[ 'databases' ][ $client_key ]; 
+                    $this->set_db_client_config( $client_key, $data_config, $db_client_class );
+
+                }
+
+            }
+
+        }
 
     }
 
@@ -321,7 +367,8 @@ class Environment_configuration {
                 'status'   => 404,
                 'issue_id' => 'environment_config_011', 
                 'message'  => 'Client not found', 
-                'source'   => get_class()
+                'source'   => get_class(), 
+                'data' => array( 'missing_client_name' => $client_name )
             ) );
 
         }
@@ -444,9 +491,9 @@ class Environment_configuration {
     }
 
     Private function get_program_directories( $search_directory, $domain ) : array {
-
+        
         $response = array();
-        $domain_dir = $domain . '/';
+        $domain_dir = str_replace( '.', '_', $domain ) . '/';
         $program_directories = $this->program_directories_structure;
 
         $matching_search_response = $this->Directory_search->search( 
@@ -474,7 +521,7 @@ class Environment_configuration {
             $matching_domain_directories = $matching_search_response[ 'data' ][ $domain_dir ]; 
 
             foreach( $matching_domain_directories as $directory => $relative_path ) {
-
+                
                 $slash = "/";
 
                 if( strpos( $directory, $slash ) === false ) {
@@ -483,7 +530,7 @@ class Environment_configuration {
 
                 $path = explode( $slash, $directory );
                 $app = $path[ count( $path ) - 1 ]; 
-
+                
                 switch( $app ) {
 
                     case 'environment_variables' : 
@@ -515,11 +562,13 @@ class Environment_configuration {
 
             }
 
-            $program_directories[ 'tests' ][ 'shared' ] = $search_directory . '/protools_framework/tests/';
-            $program_directories[ 'shared' ] = $search_directory . '/protools_framework/bootstrap/shared/';
+            $program_directories[ 'site' ] = getcwd();
             $program_directories[ 'root' ] = $search_directory;
             $program_directories[ 'framework' ] = $search_directory . '/protools_framework/';
             $program_directories[ 'vendor' ] = $search_directory . '/vendor/';
+            $program_directories[ 'tests' ][ 'shared' ] = $search_directory . '/protools_framework/tests/';
+            $program_directories[ 'shared' ] = $search_directory . '/protools_framework/bootstrap/shared/';
+            $program_directories[ 'bootstrap' ] = $search_directory . '/protools_framework/bootstrap/'; 
 
             $response = $this->Api_response->get_response( array(
                 'error'    => false,
@@ -603,7 +652,7 @@ class Environment_configuration {
 
         if( $this->is_cli() ) { 
 
-            $args = $this->get_cli_arg_context( $_SERVER[ 'argv' ][ 1 ] );
+            $args = $this->parse_path( $_SERVER[ 'argv' ][ 1 ] );
             $domain = $args[ 'domain' ];
 
         } else {
@@ -619,19 +668,42 @@ class Environment_configuration {
     Private function get_app_path() {
         
         if( $this->is_cli() ) { 
-
-            $response = $this->get_cli_arg_context( $_SERVER[ 'argv' ][ 1 ] );
-            $response[ 'params' ] = $this->parse_args( $_SERVER[ 'argv' ][ 1 ] );
-
+            $response = $this->parse_path( $_SERVER[ 'argv' ][ 1 ] );
         } else {
-            
             $response = $this->parse_path( $_SERVER[ 'HTTP_HOST' ] . $_SERVER[ 'REQUEST_URI' ] );
-            $response[ 'params' ] = $this->parse_args( $_SERVER[ 'HTTP_HOST' ] . $_SERVER[ 'REQUEST_URI' ] );
-
         }
 
         return $response;
 
+    }
+
+    Private function get_request_params() {
+
+        if( $this->is_cli() ) { 
+        
+            return array(
+                'method' => 'cli', 
+                'data' => $this->parse_args( $_SERVER[ 'argv' ][ 1 ] )
+            );
+        
+        }
+
+        if( $_SERVER[ 'REQUEST_METHOD' ] !== 'GET' ) {
+
+            return array( 
+                'method' => $_SERVER[ 'REQUEST_METHOD' ], 
+                'data' => urldecode( file_get_contents( 'php://input' ) ) 
+            );
+            
+        } else {
+        
+            return array( 
+                'method' => $_SERVER[ 'REQUEST_METHOD' ], 
+                'data' => $_GET 
+            );  
+        
+        }
+       
     }
 
     Private function is_cli() : bool {
@@ -664,15 +736,6 @@ class Environment_configuration {
     
     }
 
-    Private function get_cli_arg_context( string $server_argv ) : array {
-
-        $parsed_path = array();
-        $args = array();
-
-        return $this->parse_path( $server_argv );
-
-    }
-
     Private function parse_path( string $path ) : array {
 
         $has_get_parameters = strpos( $path, '?' ); 
@@ -682,7 +745,6 @@ class Environment_configuration {
             $path = substr( $path, 0, strpos( $path, '?' ) );				
         }
 
-        $tmp_routes = array(); 
         $tmp_routes = explode( '/', trim( $path, '/' ) ); 
 
         $expected_params = $this->expected_params;
@@ -700,7 +762,9 @@ class Environment_configuration {
             $routes[ $expected_params[ $i ] ] = $tmp_route; 
 
         }
-        
+
+        $routes[ 'uri' ] = substr( $path, strpos( $path, '/' ) );
+
         return $routes;
 
     }
@@ -758,7 +822,7 @@ class Environment_configuration {
 
     }
 
-    Public function get_env_config() {
+    Public function get_env_variables() {
 
         return $this->env_config;
 
@@ -769,6 +833,10 @@ class Environment_configuration {
         $datetime_now = new DateTime( "now", new DateTimeZone( 'US/EASTERN' ) ); 
         return $datetime_now->format( $format );
 
+    }
+
+    Public function set_view_route( string $path ) { 
+        $this->env_config[ 'view' ][ 'route' ] = $path;
     }
 
 }

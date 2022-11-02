@@ -6,7 +6,7 @@ setup_files=$sites_dir/_prototypes/tmp/setup_files/
 rm -r $protools_framework_dir/tests/active_tests
 rm -r $protools_framework_dir/tests/archive
 rm -r $protools_framework_dir/tests/reports
-rm -r $protools_framework_dir/tests/test_results
+rm -r $protools_framework_dir/tests/test-results
 
 cp -R $setup_files/tests/active_tests $protools_framework_dir/tests/active_tests
 cp -R $setup_files/tests/archive $protools_framework_dir/tests/archive

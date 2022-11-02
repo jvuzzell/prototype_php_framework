@@ -6,6 +6,8 @@ use Bootstrap\Shared\Utilities\Classes\Api_response as Api_response;
  * Set Universal Exception Handler
  */
 
+const debug_env = 'prod';
+
 function universal_exception_handler( $exception ) {
 
     $response_code = 500;
@@ -30,16 +32,25 @@ function universal_exception_handler( $exception ) {
         )
     );
 
-    if ( ! defined( 'IS_CLI' ) ) {
-        Api_response::print_stderr( $exception_response, 'dev' );
+    switch(true) {
+        case ( ! defined( 'IS_CLI' ) && ! isset( $_SERVER ) ) : 
+            Api_response::print_stderr( $exception_response, debug_env );
+            break; 
+        case ( ! defined( 'IS_CLI' ) && isset( $_SERVER ) ) : 
+            Api_response::print_json_to_screen( 500, $exception_response, debug_env ); 
+            break; 
+        case IS_CLI : 
+            Api_response::print_stderr( $exception_response, ENV_NAME );
+        case ( ! defined( 'ERROR_PAGE' ) || ! defined( 'ENV_NAME' ) ) :
+            Api_response::print_json_to_screen( 500, $exception_response, debug_env );
+            break; 
+        default : 
+            Api_response::route_to_custom_page( 500, $exception_response, ERROR_PAGE, ENV_NAME ); 
+            break;
     }
-    
-    if( IS_CLI ) {
-        Api_response::print_stderr( $exception_response, ENV_NAME );
-    } else {
-        Api_response::route_to_custom_page( 404, $exception_response, ERROR_PAGE, ENV_NAME ); 
-    } 
 
+    exit; 
+    
 }
 
 /**
@@ -52,21 +63,10 @@ function universal_error_handler( $severity, $message, $file, $line ) {
 
 }
 
-/**
-* Checks for a fatal error, work around for set_error_handler not working on fatal errors.
-*/
-function check_for_fatal() {
-
-    $error = error_get_last();
-
-    if ( isset( $error["type"] ) && $error["type"] == E_ERROR ) {
-        trigger_error( $error["type"], $error["message"], $error["file"], $error["line"] );
-    }
-
-}
-
-register_shutdown_function( "check_for_fatal" );
 set_error_handler( 'universal_error_handler' );
 set_exception_handler( 'universal_exception_handler' );
-ini_set( "display_errors", "off" );
-error_reporting( E_ALL );
+
+if( debug_env !== 'prod' ) {
+    ini_set( "display_errors", "on" );
+    error_reporting( E_ALL );
+}
