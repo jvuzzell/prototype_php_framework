@@ -1,0 +1,13 @@
+{
+    "results" : {
+        "resources" : {
+            "default" : {
+                "views" : {
+                    "default" : "test_results/resources/page_test_results/app.php", 
+                    "report" : "test_results/resources/page_test_results/app.php"
+                }
+            } 
+        }
+    }
+}
+

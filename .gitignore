@@ -11,4 +11,5 @@ tests/test-results/*
 environment_variables/
 .vscode
 .idea
-tmp/
+**/log
+**/page_cache
