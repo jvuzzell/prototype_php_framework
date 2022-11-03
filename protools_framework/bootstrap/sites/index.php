@@ -1,3 +1,5 @@
 <?php 
-require_once( 'config.php' );
-require_once( 'router.php' ); 
+
+require( 'config.php' );
+require( '../shared/config.php' );
+require( 'app.php' );

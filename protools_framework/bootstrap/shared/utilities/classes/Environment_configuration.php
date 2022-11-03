@@ -5,6 +5,7 @@ use \Dump_var;
 use \Exception;
 use \DateTime; 
 use \DateTimeZone;
+use ErrorException;
 
 /** 
  * @package Environment Configuration
@@ -53,6 +54,7 @@ class Environment_configuration {
         'is_cli' => '',
         'env_name' => '',
         'request_protocol' => '',
+        'site_log' => '',
         'view' => array(
             'route' => ''
         ),
@@ -85,7 +87,7 @@ class Environment_configuration {
         'view', 
     );
 
-    Private $program_directories_structure = array(
+    Private $program_directories = array(
         'portfolio' => array(
             'site_specific' => null, 
             'shared' => null
@@ -105,7 +107,7 @@ class Environment_configuration {
         'static_assets' => array(
             'site_specific' => null, 
             'shared' => null
-        )
+        ), 
     );
 
     Public function __construct( array $args ) {
@@ -143,11 +145,12 @@ class Environment_configuration {
 
         // Set site specific directories for Environment Variables, APIs, Assets, Testing, Themes, Portfolio
         $program_directories_response = $this->get_program_directories( $this->project_root_directory, $domain_name );
-
+        $domain_key = str_replace( '.', '_', $domain_name ) . '/';
+        
         if( $program_directories_response[ 'error' ] ) {
             throw new Exception( $program_directories_response[ 'message' ] );
         } else {
-            $program_directories = $program_directories_response[ 'data' ][ 'program_directories' ]; 
+            $this->program_directories = $program_directories_response[ 'data' ][ 'program_directories' ]; 
         }
 
         // Get environment name
@@ -169,15 +172,6 @@ class Environment_configuration {
             $env_domains = $env_domain_response[ 'data' ]; 
         }
 
-        // Retrieve data_source data object from environment variable folder
-        $data_source_response = $this->get_data_sources( $program_directories[ 'environment_variables' ] );
-
-        if( $data_source_response[ 'error' ] ) {
-            throw new Exception( $data_source_response[ 'message' ] );
-        } else {
-            $this->data_sources = $data_source_response[ 'data' ]; 
-        }
-        
         // Generate clients
         if ( isset( $args[ 'clients' ] ) && !empty( $args[ 'clients' ] ) ) {
 
@@ -186,15 +180,29 @@ class Environment_configuration {
 
         }
 
+        // Start log file
+        $log_directory = $this->program_directories[ 'tmp' ][ 'site_specific' ] . 'log/'; 
+        $log_filename = $log_directory . $this->get_datetime_now( 'Y-m-d' ) . '_log.txt';
+
+        if( !is_dir( $log_directory ) ) {
+            mkdir( $log_directory );
+        }
+
+        if( !file_exists( $log_filename ) ) {
+            $log_file = fopen( $log_filename, 'w' );
+            fclose( $log_file );
+        } 
+
         // Final - Compile environment configuration
         $this->env_config = array_merge( $this->env_config, array(
             'is_cli' => $is_cli, 
             'env_name' => $env_name,
             'request_protocol' => $request_protocol,
+            'site_log' => $log_filename,
             'app_path' => $app_path,
             'request' => $request_parameters,  
             'env_domains' => $env_domains[ 'url' ],
-            'directories' => $program_directories
+            'directories' => $this->program_directories, 
         ));
 
     }
@@ -213,15 +221,22 @@ class Environment_configuration {
 
     Public function set_clients( array $clients ) {
 
-        $data_sources = $this->data_sources; 
+        // Retrieve data_source data object from environment variable folder
+        $data_source_response = $this->get_data_sources( $this->program_directories[ 'environment_variables' ] );
 
+        if( $data_source_response[ 'error' ] ) {
+            throw new Exception( $data_source_response[ 'message' ] );
+        } else {
+            $data_sources = $data_source_response[ 'data' ]; 
+        }
+        
         // Instantiate Curl Clients
         if ( isset( $clients[ 'curl' ] ) && !empty( $clients[ 'curl' ] ) ) {
 
             $curl_clients = $clients[ 'curl' ]; 
 
             foreach( $curl_clients as $client_key => $curl_client_class ) {
-                // Dump_var::print( $client_key );
+
                 // Validation
                 if( !gettype( $curl_client_class ) === 'object' ) {
                     throw new Exception( 'Curl Clients - unable to initialize client; cURL client object missing' );
@@ -494,7 +509,7 @@ class Environment_configuration {
         
         $response = array();
         $domain_dir = str_replace( '.', '_', $domain ) . '/';
-        $program_directories = $this->program_directories_structure;
+        $program_directories = $this->program_directories;
 
         $matching_search_response = $this->Directory_search->search( 
             array( $domain_dir ), 
@@ -521,7 +536,7 @@ class Environment_configuration {
             $matching_domain_directories = $matching_search_response[ 'data' ][ $domain_dir ]; 
 
             foreach( $matching_domain_directories as $directory => $relative_path ) {
-                
+
                 $slash = "/";
 
                 if( strpos( $directory, $slash ) === false ) {

@@ -1,6 +1,6 @@
 <?php 
 
-use Bootstrap\Shared\Utilities\Classes\Api_response as Api_response;
+use Bootstrap\Shared\Utilities\Classes\Static\Api_response as Api_response;
 
 /**
  * Set Universal Exception Handler
