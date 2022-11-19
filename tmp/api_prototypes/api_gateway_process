@@ -1,0 +1,41 @@
+API Gateway Order of Operations 
+
+Solution - replace JWT Management Object... 
+    - Canabalize features into Environment Config: 
+        - Request Data 
+        - Request Method
+        - Request Header 
+        - Request Authorization 
+
+
+1. Initialize environment configurations (environment_config)
+    - Gateway specific configs 
+    - Shared configs 
+        - Environment config object
+            - URL/URI [x]
+            - Directories [x]
+            - Clients [x]
+            - Command Line Flag [x]
+            - (Tentative) (Get these from request or allow to be set via local API call)
+                - Request Data [x]
+                - Request Method [x]
+                - Request Header [x]
+                - Request Authorization [x] 
+2. Get Fingerprint (fingerprint_manager)
+    - 
+3. Route (api_router)
+    - Check for cached routes [x]
+        - Create new cache if necessary
+    - Is fingerprint required?
+    - Authorize
+        -  Is fingerprint authorized to use this endpoint?
+5. Resolve (api_resolver)
+    - Input 
+        - Validate
+    - Output
+        - Structure output
+
+
+NOTE: 
+- API Gateway must completely dependent on Environment_config Object 
+- JWT Manager should be converted to Fingerprint Manager  

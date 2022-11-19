@@ -1,0 +1,8 @@
+{
+    "status": 200,
+    "error": false,
+    "message": "JWT claims",
+    "data": {
+        "jwt": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFZERTQSJ9.eyJpc3MiOIJhcGkucHJvdG90eXBlcy5kdiIsImF1ZCI6ImFwaS5wcm90b3R5cGVzLmR2IiwiaWF0IjoxNjY4Nzk3NDA2LCJ1c2VyIjoianZ1enplbGwiLCJleHAiOjE2Njk0MDIyMDZ9.HbH9WfrdEJDSoH61gVRswTVMbJk3YUfDBQunYXgcWzOpInq87EKoAJXfVfeQ0hdY6P4S98YUdHv9qCMLOtG2CQ"
+    }
+}

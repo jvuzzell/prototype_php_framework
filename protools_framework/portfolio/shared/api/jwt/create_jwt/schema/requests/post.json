@@ -1,0 +1,29 @@
+{
+    "settings" : {
+        "strict_validation" : true, 
+        "resolver_callback" : "create_jwt", 
+        "experimental" : true,
+        "deprecated" : false,
+        "version" : "1.0", 
+        "response_codes" : { 
+            "200" : { 
+                "description" : ""
+            }
+        }
+    },
+    "fields" : {
+        "username" : {
+            "field_validation" : {
+                "required" : true,  
+                "data_type" : "string", 
+                "regex_expression" : "username"
+            }
+        }, 
+        "expiration" : {
+            "field_validation" : {
+                "required" : true,  
+                "data_type" : "integer"
+            }
+        }
+    }
+}

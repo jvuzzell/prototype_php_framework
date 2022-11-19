@@ -2,7 +2,9 @@
 
 namespace Bootstrap\Shared\Utilities\Classes;
 
+use Bootstrap\Shared\Utilities\Classes\Static\Api_response as Api_response;
 use \Exception;
+use Dump_var;
 
 /**
  * cURL client with basic authorization
@@ -116,9 +118,9 @@ class Curl_client {
      */
 
     public function execute( $args ) {
-        
+      
         $args = array_merge( $this->args, $args );
-        // Dump_var::print( $args );
+   
         $this->json_response = $args[ 'json_response' ]; 
 
         $request_data = $args[ 'request_data' ]; 
@@ -223,7 +225,7 @@ class Curl_client {
                 ( $args[ 'authorization_type' ] == 'bearer-token' ) && 
                 isset( $args[ 'bearer_token' ] )
             ) {
-                $authConfigs[ 'bearer-token' ] = "Authorization: Bearer " . $args[ 'bearer_token' ];
+                $authConfigs[ 'bearer-token' ] = "Authorization: Bearer " . call_user_func( $this->decrypt, $args[ 'bearer_token' ], $this->nonce, $this->key );
             }
 
             array_push( $httpHeaders, $authConfigs[ $args[ 'authorization_type' ] ] );
@@ -237,105 +239,45 @@ class Curl_client {
             }
         }
 
-        // Set header 
-        curl_setopt( $this->client, CURLOPT_HTTPHEADER, $httpHeaders );
-
         // Add request length to client request if PUT method used
         if( strtoupper( $args[ 'request_method' ] ) === 'PUT' ) {
 
-            curl_setopt( $this->client, CURLOPT_CONTENTLENGTH, count( $args[ 'request_data' ] ) );
-
+            array_push( $httpHeaders, 'Content-Length: ' . $args[ 'request_data' ] );  
+             
         }
+
+        // Set header 
+        curl_setopt( $this->client, CURLOPT_HTTPHEADER, $httpHeaders );
 
         /**
          * Execute and process curl call 
          */
         
-        $results = curl_exec( $this->client );  
+        $results = curl_exec( $this->client ); 
+        $response = $this->format_results( $results );  
+        curl_close( $this->client ); 
 
         // Return formatted response
-        return $this->response( $results ); 
-
-    }
-
-    /**
-     * Response
-     * 
-     * @param array object $client curl client 
-     *    
-     * @return array results of client request in standard response format
-     */
-
-    private function response( $results ) {
-        
-        // Parse results
-        $response = $this->parse_results( $results );
-
-        if( $response[ 'error' ] ) {
-
-            return array(
-                'status'           => $response[ 'status' ], 
-                'error'            => $response[ 'error' ], 
-                'system'           => $response[ 'system' ],
-                'source'           => $response[ 'source' ],
-                'message'          => $response[ 'message' ], 
-                'data'             => $response[ 'data' ]
-            );
-
-        }
-
-        // Close connection
-        curl_close( $this->client );  
-
-        // Return response
-        return array(
-            'status'           => $response[ 'status' ], 
-            'error'            => $response[ 'error' ], 
-            'system'           => $response[ 'system' ],
-            'source'           => $response[ 'source' ],
-            'message'          => $response[ 'message' ], 
-            'response_headers'  => $response[ 'response_headers' ],
-            'response_code'  => $response[ 'response_code' ],
-            'request_headers'   => $response[ 'request_headers' ],
-            'data'             => $response[ 'data' ]
-        );
-
-    }
-
-    /**
-     * Parse Results 
-     * 
-     * @param array   $results        results of curl call
-     * 
-     * @return array  response data array of values including status, error, message, etc...
-     */
+        return $response; 
     
-    private function parse_results( $results ) {
-
-        // Check for client errors 
-        if ( $results === FALSE ) {
-            return $this->get_client_errors( $results );
-        } 
-
-        // Check for result errors and format
-        return $this->format_results( $results );
-
     }
     
     /**
      * Format Response 
      * 
-     * @param array $results client query results
+     * @param string $results curl response
      * 
      * @return array results in standardized API response format
      */
 
-    private function format_results( $results ) {
+    private function format_results( string $results ) {
 
         $header_size = curl_getinfo( $this->client, CURLINFO_HEADER_SIZE );
         $header = substr( $results, 0, $header_size );
         $body = substr( $results, $header_size ); 
-        $httpcode = curl_getinfo($this->client, CURLINFO_HTTP_CODE);
+        $status_code = curl_getinfo($this->client, CURLINFO_HTTP_CODE);
+        $error = false; 
+        $message = 'cURL call successful';
 
         /**
          * @todo parse non-json responses
@@ -347,54 +289,36 @@ class Curl_client {
             $results = $body;
         }
 
-        /**
-         * Format response
-         */
+        if(
+            $status_code !== 200 && 
+            $status_code !== 201 && 
+            $status_code !== 202 &&
+            $status_code !== 203 &&
+            $status_code !== 204 &&
+            $status_code !== 205 &&
+            $status_code !== 206 
+        ) { 
+            $error = true;
 
-        return array( 
-            'status'  => 200, // Success
-            'error'   => FALSE,
-            'system'  => array(
-                'issue_id' => 'curl_client_002',
-                'log'      => FALSE, 
-                'private'  => FALSE, 
-                'continue' => TRUE, 
-                'email'    => FALSE
-            ),
-            'source'  => get_class(),
-            'message' => 'Successfully received client response; json received: ' . $this->json_response,
-            'response_headers' => $header,
-            'response_code'=>$httpcode,
-            'request_headers'  => curl_getinfo( $this->client, CURLINFO_HEADER_OUT ),
-            'data'    => $results
-        );
+            if( curl_error( $this->client ) ) {
+                $message = curl_error( $this->client ); 
+            } else { 
+                $message = $results[ 'message' ];
+            }
 
-    }
+        } 
 
-    /**
-     * Report errors
-     * 
-     * @param mixed array|bool $results
-     *  
-     * @return mixed array|bool return data regarding error or false for no errors to report
-     */
-
-    private function get_client_errors( $results ) {
-
-        return array( 
-            'status'  => 200, // Success
-            'error'   => TRUE,
-            'system'  => array(
-                'issue_id' => 'curl_client_001',
-                'log'      => TRUE, 
-                'private'  => TRUE, 
-                'continue' => FALSE, 
-                'email'    => FALSE
-            ),
-            'source'  => get_class(),
-            'message' => curl_error( $this->client ) . '; curl_errno: ' . curl_errno( $this->client ),
-            'data'    => $results
-        );
+  
+        $response = Api_response::format_response( array(
+            'status'  => $status_code, // Success
+            'error'   => $error, 
+            'issue_id' => 'curl_client_001', 
+            'source' => get_class(),
+            'message' => $message, 
+            'data' => $results
+        ));
+        
+        return $response; 
 
     }
 

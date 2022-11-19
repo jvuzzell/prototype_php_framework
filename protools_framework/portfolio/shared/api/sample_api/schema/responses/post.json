@@ -1,0 +1,19 @@
+{
+    "settings" : {
+        "strict_validation" : false, 
+        "resolver_callback" : "sample_response_callback"
+    },
+    "fields" : {
+        "sampleField1_response" : {
+            "field_meta" : {
+                "response_field_name" : "", 
+                "resolver_callback" : "sample_response_callback"
+            }, 
+            "field_validation" : {
+                "required" : true, 
+                "default_value" : "", 
+                "data_type" : "string"
+            }
+        }
+    }
+}

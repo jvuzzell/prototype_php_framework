@@ -104,7 +104,7 @@ if( !IS_CLI ) {
     } 
     
     if ( ! defined( 'REQUEST_PROTOCOL' ) ) {
-        define( 'REQUEST_PROTOCOL', ENV_VAR[ 'request_protocol' ] );
+        define( 'REQUEST_PROTOCOL', ENV_VAR[ 'request' ][ 'protocol' ] );
     } 
     
     if ( ! defined( 'BASE_URL' ) ) {
@@ -135,36 +135,12 @@ if( !IS_CLI ) {
 
 $Api_response::set_log_file( 'site_log', ENV_VAR[ 'site_log' ] );
 
-/**
- * Validate clients
- */
-
-check_client_error( $Environment_config, 'protools_api' );
-check_client_error( $Environment_config, 'cms_database' );
-
-function check_client_error( $Environment_config, $client_name ) {
-
-    $client_response = $Environment_config->get_client( $client_name ); 
-
-    if( $client_response[ 'error' ] ) { 
-    
-        if( IS_CLI ) {
-            Api_response::print_json( $client_response[ 'status' ], $client_response, ENV_NAME );
-        } else {
-            Api_response::route_to_custom_page( $client_response[ 'status' ], $client_response, ERROR_PAGE, ENV_NAME );
-        }
-    
-    } 
-
-}
-
 // $Environment_config->set_clients(array(
 //     'curl' => array(
 //         'atlassian_rest_api' => new Curl_client
 //     )
 // ));
-// check_client_error( $Environment_config, 'atlassian_rest_api' );
-//
+
 // $Atlassian_rest_api = $Environment_config->get_client( 'atlassian_rest_api' )[ 'data' ][ 'class' ]; 
 // $atlassian_response = $Atlassian_rest_api->execute(
 //     array( 

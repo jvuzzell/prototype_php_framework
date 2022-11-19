@@ -1,0 +1,108 @@
+{
+    "sampleField1" : {
+        "field_meta" : {
+            "response_field_name" : "", 
+            "resolver_callback" : "sample_request_callback", 
+            "parent_field" : ""
+        }, 
+        "field_validation" : {
+            "required" : true, 
+            "default_value" : { "sampleField2" : "green", "sampleField3" : { "sameField4" : { "sameField5" : "" } } }, 
+            "data_type" : "multidimensional_array", 
+            "content_length" : -1, 
+            "max_content_length" : -1, 
+            "min_content_length" : -1, 
+            "repeatable_children" : false
+        }, 
+        "children" : {
+            "sampleField2" : {
+                "field_meta" : {
+                    "response_field_name" : "", 
+                    "resolver_callback" : "sample_request_callback", 
+                    "parent_field" : ""
+                }, 
+                "field_validation" : {
+                    "required" : true, 
+                    "default_value" : "red", 
+                    "data_type" : "string",
+                    "content_length" : -1, 
+                    "max_content_length" : -1, 
+                    "min_content_length" : -1, 
+                    "repeatable_children" : false
+                }
+            }, 
+            "sampleField3" : {
+                "field_meta" : {
+                    "response_field_name" : "", 
+                    "resolver_callback" : "sample_request_callback", 
+                    "parent_field" : ""
+                }, 
+                "field_validation" : {
+                    "required" : true, 
+                    "default_value" : "blue", 
+                    "data_type" : "multidimensional_array",
+                    "content_length" : -1, 
+                    "max_content_length" : -1, 
+                    "min_content_length" : -1, 
+                    "repeatable_children" : false
+                }, 
+                "children" :  {
+                    "sampleField4" : {
+                        "field_meta" : {
+                            "response_field_name" : "", 
+                            "resolver_callback" : "sample_request_callback", 
+                            "parent_field" : ""
+                        }, 
+                        "field_validation" : {
+                            "required" : true, 
+                            "default_value" : "blue", 
+                            "data_type" : "string",
+                            "content_length" : -1, 
+                            "max_content_length" : -1, 
+                            "min_content_length" : -1, 
+                            "repeatable_children" : false
+                        }, 
+                        "children" : {
+                            "sampleField5" : {
+                                "field_meta" : {
+                                    "response_field_name" : "", 
+                                    "resolver_callback" : "sample_request_callback", 
+                                    "parent_field" : ""
+                                }, 
+                                "field_validation" : {
+                                    "required" : true, 
+                                    "default_value" : "blue", 
+                                    "data_type" : "string",
+                                    "content_length" : -1, 
+                                    "max_content_length" : -1, 
+                                    "min_content_length" : -1, 
+                                    "repeatable_children" : false
+                                }, 
+                                "children" :  {
+                                    "sampleField6" : {
+                                        "field_meta" : {
+                                            "response_field_name" : "", 
+                                            "resolver_callback" : "sample_request_callback", 
+                                            "parent_field" : ""
+                                        }, 
+                                        "field_validation" : {
+                                            "required" : true, 
+                                            "default_value" : "blue", 
+                                            "data_type" : "string",
+                                            "content_length" : -1, 
+                                            "max_content_length" : -1, 
+                                            "min_content_length" : -1, 
+                                            "repeatable_children" : false
+                                        }
+                
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+}

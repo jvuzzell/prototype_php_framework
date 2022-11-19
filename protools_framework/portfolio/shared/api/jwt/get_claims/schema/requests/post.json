@@ -1,0 +1,24 @@
+{
+    "settings" : {
+        "strict_validation" : true, 
+        "resolver_callback" : "get_claims", 
+        "experimental" : true,
+        "deprecated" : false,
+        "version" : "1.0", 
+        "response_codes" : { 
+            "200" : { 
+                "description" : ""
+            }
+        }
+    },
+    "fields" : {
+        "jwt" : {
+            "field_validation" : {
+                "required" : true,  
+                "data_type" : "string", 
+                "regex_expression" : "jwt", 
+                "max_content_length" : 1024
+            }
+        }
+    }
+}

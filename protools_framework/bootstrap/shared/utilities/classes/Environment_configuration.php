@@ -53,10 +53,10 @@ class Environment_configuration {
     Private $env_config = array(
         'is_cli' => '',
         'env_name' => '',
-        'request_protocol' => '',
         'site_log' => '',
-        'view' => array(
-            'route' => ''
+        'route' => array(
+            'view' => '', 
+            'api' => ''
         ),
         'app_path' => array(
             'domain' => '', 
@@ -65,8 +65,15 @@ class Environment_configuration {
             'view' => ''
         ),
         'request' => array(
+            'protocol' => '', 
             'method' => '', 
-            'data' => array()
+            'bearer_token' => '',
+            'data' => array(), 
+            'header' => array(), 
+            'remote_address' => '', 
+            'remote_port' => '', 
+            'request_time_float' => 0, 
+            'request_time' => 0
         ),
         'env_domains' => array(
             'main_site' => '', 
@@ -124,8 +131,7 @@ class Environment_configuration {
         $is_cli = $this->is_cli();    
         $domain = $this->set_domain(); 
         $app_path = $this->get_app_path();
-        $request_protocol = ( $is_cli ) ? null : $this->set_request_protocol();
-        $request_parameters = $this->get_request_params();
+        $request_meta = $this->get_request_meta();
 
         $full_domain_arr = explode( '.', $domain );
         array_pop( $full_domain_arr ); // Remove TLD
@@ -174,10 +180,8 @@ class Environment_configuration {
 
         // Generate clients
         if ( isset( $args[ 'clients' ] ) && !empty( $args[ 'clients' ] ) ) {
-
             $clients = $args[ 'clients' ];
             $this->set_clients( $clients );
-
         }
 
         // Start log file
@@ -197,13 +201,30 @@ class Environment_configuration {
         $this->env_config = array_merge( $this->env_config, array(
             'is_cli' => $is_cli, 
             'env_name' => $env_name,
-            'request_protocol' => $request_protocol,
             'site_log' => $log_filename,
             'app_path' => $app_path,
-            'request' => $request_parameters,  
+            'request' => $request_meta,  
             'env_domains' => $env_domains[ 'url' ],
             'directories' => $this->program_directories, 
         ));
+
+    }
+
+    /**
+     * Get Request Header
+     */
+
+    Private function get_request_header() {
+
+        // Parse header values 
+        $headers = array();
+        foreach ( $_SERVER as $key => $value ) {
+            if ( strpos( $key, 'HTTP_' ) === 0 ) {
+                $headers[ str_replace( ' ', '', ucwords( str_replace( '_', ' ', strtolower( substr( $key, 5) ) ) ) ) ] = $value;
+            }
+        }
+
+        return $headers; 
 
     }
 
@@ -217,6 +238,8 @@ class Environment_configuration {
      *      ), 
      *      'email' => array()
      * )
+     * 
+     * Note: The client information must be in environment variables file of this will not work
      */
 
     Public function set_clients( array $clients ) {
@@ -234,7 +257,7 @@ class Environment_configuration {
         if ( isset( $clients[ 'curl' ] ) && !empty( $clients[ 'curl' ] ) ) {
 
             $curl_clients = $clients[ 'curl' ]; 
-
+            
             foreach( $curl_clients as $client_key => $curl_client_class ) {
 
                 // Validation
@@ -288,7 +311,7 @@ class Environment_configuration {
 
             $env_domains = include( $env_domain_path );
 
-            $response = $this->Api_response->get_response( array(
+            $response = $this->Api_response->format_response( array(
                 'status'   => 200,
                 'error'    => false,
                 'issue_id' => 'environment_config_015', 
@@ -299,7 +322,7 @@ class Environment_configuration {
 
         } else {
 
-            $response = $this->Api_response->get_response( array(
+            $response = $this->Api_response->format_response( array(
                 'status'   => 404,
                 'issue_id' => 'environment_config_014', 
                 'message'  => 'Environment domain file not found', 
@@ -363,11 +386,17 @@ class Environment_configuration {
 
     }
 
+    Public function get_clients() {
+
+        return $this->clients;
+
+    }
+
     Public function get_client( string $client_name ) { 
 
         if( isset( $this->clients[ $client_name ] ) ) {
             
-            $response = $this->Api_response->get_response( array(
+            $response = $this->Api_response->format_response( array(
                 'error'    => false,
                 'status'   => 200,
                 'issue_id' => 'environment_config_010', 
@@ -378,7 +407,7 @@ class Environment_configuration {
 
         } else {
 
-            $response = $this->Api_response->get_response( array(
+            $response = $this->Api_response->format_response( array(
                 'status'   => 404,
                 'issue_id' => 'environment_config_011', 
                 'message'  => 'Client not found', 
@@ -403,7 +432,7 @@ class Environment_configuration {
 
         } else {
 
-            $response = $this->Api_response->get_response( array(
+            $response = $this->Api_response->format_response( array(
                 'status'   => 404,
                 'issue_id' => 'environment_config_007', 
                 'message'  => 'Environment domain file not found', 
@@ -430,7 +459,7 @@ class Environment_configuration {
 
         if( $match ) {
 
-            $response = $this->Api_response->get_response( array(
+            $response = $this->Api_response->format_response( array(
                 'error'    => false, 
                 'status'   => 200,
                 'issue_id' => 'environment_config_006', 
@@ -443,7 +472,7 @@ class Environment_configuration {
 
         } else {
 
-            $response = $this->Api_response->get_response( array(
+            $response = $this->Api_response->format_response( array(
                 'status'   => 404,
                 'issue_id' => 'environment_config_005', 
                 'message'  => 'Environment name not found', 
@@ -481,7 +510,7 @@ class Environment_configuration {
 
         if( $combined_data_sources === null ) {
 
-            $response = $this->Api_response->get_response( array(
+            $response = $this->Api_response->format_response( array(
                 'status'   => 404,
                 'issue_id' => 'environment_config_003', 
                 'message'  => 'data_sources - data sources not found', 
@@ -490,7 +519,7 @@ class Environment_configuration {
 
         } else {
 
-            $response = $this->Api_response->get_response( array(
+            $response = $this->Api_response->format_response( array(
                 'error'    => false,
                 'status'   => 200,
                 'issue_id' => 'environment_config_004', 
@@ -524,7 +553,7 @@ class Environment_configuration {
             $matching_search_response[ 'status' ] === 404
         ) {
 
-            $response = $this->Api_response->get_response( array(
+            $response = $this->Api_response->format_response( array(
                 'status'   => 404,
                 'issue_id' => 'environment_config_008', 
                 'message'  => $matching_search_response[ 'message' ] . ' - missing site specific directories', 
@@ -566,7 +595,7 @@ class Environment_configuration {
 
                     case 'portfolio' : 
                         $program_directories[ 'portfolio' ][ 'site_specific' ] = $directory . '/' . $domain_dir;
-                        $program_directories[ 'portfolio' ][ 'shared' ] = $directory . '/shared/'; 
+                        $program_directories[ 'portfolio' ][ 'shared' ] = $directory . '/shared/api/'; 
                         break;
 
                     case 'tmp' : 
@@ -585,7 +614,7 @@ class Environment_configuration {
             $program_directories[ 'shared' ] = $search_directory . '/protools_framework/bootstrap/shared/';
             $program_directories[ 'bootstrap' ] = $search_directory . '/protools_framework/bootstrap/'; 
 
-            $response = $this->Api_response->get_response( array(
+            $response = $this->Api_response->format_response( array(
                 'error'    => false,
                 'status'   => 200,
                 'issue_id' => 'environment_config_009', 
@@ -616,7 +645,7 @@ class Environment_configuration {
             $matching_search_response[ 'status' ] === 404
         ) {
 
-            $response = $this->Api_response->get_response( array(
+            $response = $this->Api_response->format_response( array(
                 'status'   => 404,
                 'issue_id' => 'environment_config_001', 
                 'message'  => $matching_search_response[ 'message' ] . ' - missing environment_variables', 
@@ -629,7 +658,7 @@ class Environment_configuration {
             $directory_name = array_keys( $files_found )[ 0 ];
             $filepath = realpath( $files_found[ $directory_name ][ 0 ] ); 
 
-            $response = $this->Api_response->get_response( array(
+            $response = $this->Api_response->format_response( array(
                 'error'    => false,
                 'status'   => 200,
                 'issue_id' => 'environment_config_002', 
@@ -692,33 +721,66 @@ class Environment_configuration {
 
     }
 
-    Private function get_request_params() {
+    Private function get_request_meta() : array {
+
+        $meta = array();
+        $request_meta = array(
+            'method' => null, // string, Request method
+            'protocol' => null, // string, HTTP or HTTPS
+            'bearer_token' => null, // string, JWT
+            'headers' => null, // array, HTTP headers as an array
+            'remote_address' => null, // string, IP address of client
+            'remote_port' => null, // string, Port of client
+            'request_time_float' => null, // int, Time since start of request
+            'request_time' => null, // int, Time since start of request
+        );
 
         if( $this->is_cli() ) { 
         
-            return array(
+            $meta = array(
                 'method' => 'cli', 
-                'data' => $this->parse_args( $_SERVER[ 'argv' ][ 1 ] )
+                'data' => $this->parse_args( $_SERVER[ 'argv' ][ 1 ] ), 
+                'protocol' => null
             );
-        
+
+        } else {
+
+            $meta = array(
+                'method' => $_SERVER[ 'REQUEST_METHOD' ], 
+                'protocol' => $this->set_request_protocol(),
+                'bearer_token' => $this->get_bearer_token(),
+                'headers' => $this->get_request_header(),
+                'remote_address' => $_SERVER[ 'REMOTE_ADDR' ], 
+                'remote_port' => $_SERVER[ 'REMOTE_PORT' ], 
+                'request_time_float' => $_SERVER[ 'REQUEST_TIME_FLOAT' ], 
+                'request_time' => $_SERVER[ 'REQUEST_TIME' ]
+            );
+
+            $request_meta = array_merge( $request_meta, $meta );
+
         }
 
-        if( $_SERVER[ 'REQUEST_METHOD' ] !== 'GET' ) {
+        if( $_SERVER[ 'REQUEST_METHOD' ] === 'GET' ) {
 
-            return array( 
-                'method' => $_SERVER[ 'REQUEST_METHOD' ], 
-                'data' => urldecode( file_get_contents( 'php://input' ) ) 
+            $meta = array( 
+                'headers' => $this->get_request_header(),
+                'data' => $_GET
             );
             
         } else {
-        
-            return array( 
-                'method' => $_SERVER[ 'REQUEST_METHOD' ], 
-                'data' => $_GET 
+            
+            // Expecting JSON in the body not form data
+            $meta = array( 
+                'headers' => $this->get_request_header(),
+                'data' => urldecode( file_get_contents( 'php://input' ) ) 
             );  
         
         }
-       
+
+        $request_meta = array_merge( $request_meta, $meta );
+        
+        return $request_meta;
+
     }
 
     Private function is_cli() : bool {
@@ -813,9 +875,56 @@ class Environment_configuration {
 
     }
 
+    /** 
+     * Get header Authorization
+     */
+
+    Private function get_authorization_header() {
+        
+        $headers = null;
+        if( isset( $_SERVER[ 'Authorization' ] ) ) {
+            $headers = trim( $_SERVER[ 'Authorization' ] );
+        }
+        else if( isset( $_SERVER[ 'HTTP_AUTHORIZATION' ] ) ) { //Nginx or fast CGI
+            $headers = trim( $_SERVER[ 'HTTP_AUTHORIZATION' ] );
+        } 
+        else if( function_exists( 'apache_request_headers' ) ) {
+
+            $requestHeaders = apache_request_headers();
+            // Server-side fix for bug in old Android versions (a nice side-effect of this fix means we don't care about capitalization for Authorization)
+            $requestHeaders = array_combine(array_map('ucwords', array_keys($requestHeaders)), array_values($requestHeaders));
+
+            if ( isset( $requestHeaders[ 'Authorization' ] ) ) {
+                $headers = trim( $requestHeaders[ 'Authorization' ] );
+            }
+
+        }
+
+        return $headers;
+
+    }
+
+    /**
+     * Get access token from header
+     */
+
+    Private function get_bearer_token() {
+
+        $headers = $this->get_authorization_header();
+        // HEADER: Get the access token from the header
+        if (!empty($headers)) {
+            if (preg_match('/Bearer\s(\S+)/', $headers, $matches)) {
+                return $matches[1];
+            }
+        }
+
+        return null;
+
+    }
+
     Public function get_request_protocol() {
 
-        return $this->env_config[ 'request_protocol' ];
+        return $this->env_config[ 'request' ][ 'protocol' ];
 
     }
 
@@ -851,7 +960,15 @@ class Environment_configuration {
     }
 
     Public function set_view_route( string $path ) { 
-        $this->env_config[ 'view' ][ 'route' ] = $path;
+     
+        $this->env_config[ 'route' ][ 'view' ] = $path;
+    
+    }
+
+    Public function set_api_route( string $path ) {
+
+        $this->env_config[ 'route' ][ 'api' ] = $path;
+
     }
 
 }

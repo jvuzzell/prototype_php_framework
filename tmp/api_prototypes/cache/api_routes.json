@@ -1,0 +1,63 @@
+{
+    "sample_api" : {
+        "uri" : "sample_api", 
+        "directory" : "sample_api", 
+        "version" : "", 
+        "title" : "", 
+        "description" : "",
+        "reference_url" : "", 
+        "contact" : {
+            "name" : "", 
+            "url" : "", 
+            "email" : ""
+        }, 
+        "tags" : [], 
+        "redirect" : {
+            "destination" : "", 
+            "since" : "" 
+        },
+        "request_methods" : {
+            "post" : {
+                "permission_type" : "none"
+            }, 
+            "get" : {
+                "permission_type" : "none"
+            }
+        }
+    }, 
+    "jwt_create" : {
+        "uri" : "jwt/create", 
+        "directory" : "jwt/create_jwt", 
+        "version" : "1.0", 
+        "title" : "Create JWT", 
+        "contact" : {
+            "name" : "Joshua Uzzell", 
+            "url" : "", 
+            "email" : ""
+        }, 
+        "tags" : [ "administration", "permissions", "jwt" ],
+        "request_methods" : {
+            "post" : {
+                "permission_type" : "basic"
+            }
+        }
+    }, 
+    "jwt_get_claims" : {
+        "uri" : "jwt/get_claims", 
+        "directory" : "jwt/get_claims", 
+        "version" : "1.0", 
+        "title" : "JWT Get Claims", 
+        "contact" : {
+            "name" : "Joshua Uzzell", 
+            "url" : "", 
+            "email" : ""
+        }, 
+        "tags" : [ "administration", "permissions", "jwt" ],
+        "request_methods" : {
+            "post" : {
+                "permission_type" : "localhost"
+            }
+        }
+    }
+
+}

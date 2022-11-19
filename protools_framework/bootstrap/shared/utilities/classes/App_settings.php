@@ -2,7 +2,7 @@
 
 namespace Bootstrap\Shared\Utilities\Classes;
 
-use Bootstrap\Shared\Utilities\Classes\Api_response as Api_response; 
+use Bootstrap\Shared\Utilities\Classes\Static\Api_response as Api_response; 
 
 class App_settings {
 

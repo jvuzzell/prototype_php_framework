@@ -2,7 +2,7 @@
 
 require( $page_controls_location );
 
-use Bootstrap\Shared\Utilities\Classes\Api_response as Api_response;
+use Bootstrap\Shared\Utilities\Classes\Static\Api_response as Api_response;
 use Bootstrap\Shared\Utilities\Classes\Json_validator as Json_validator;
 use Bootstrap\Shared\Controllers\Page_controller as Page_controller; 
 use Bootstrap\Shared\Controllers\Model as Model; 

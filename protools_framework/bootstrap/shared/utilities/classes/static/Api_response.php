@@ -2,6 +2,8 @@
 
 namespace Bootstrap\Shared\Utilities\Classes\Static;
 
+use \DateTime; 
+use \DateTimeZone;
 use \Dump_var;
 
 /** 
@@ -14,7 +16,7 @@ use \Dump_var;
  * @method print_json_to_screen
  * @method route_to_custom_page
  * @method print_stderr 
- * @method get_response
+ * @method format_response
  * 
  */
 
@@ -23,71 +25,62 @@ class Api_response {
     Private static $log_manifest = array();
 
     /**
-     * Set HTTP Response Code 
-     *  
-     * @param int $code  HTTP response code 
+     * Get HTTP Response Code Message
      */
 
-    Private static function set_http_response_code( int $code ) {
-        
-        if ( $code !== NULL ) {
+    Public static function get_http_code_message( $code ) {
 
-            switch ( $code ) {
-                case 100: $text = 'Continue'; break;
-                case 101: $text = 'Switching Protocols'; break;
+        $text = '';
 
-                case 200: $text = 'OK'; break;
-                case 201: $text = 'Created'; break;
-                case 202: $text = 'Accepted'; break;
-                case 203: $text = 'Non-Authoritative Information'; break;
-                case 204: $text = 'No Content'; break;
-                case 205: $text = 'Reset Content'; break;
-                case 206: $text = 'Partial Content'; break;
+        switch ( $code ) {
+            case 100: $text = 'Continue'; break;
+            case 101: $text = 'Switching Protocols'; break;
 
-                case 300: $text = 'Multiple Choices'; break;
-                case 301: $text = 'Moved Permanently'; break;
-                case 302: $text = 'Moved Temporarily'; break;
-                case 303: $text = 'See Other'; break;
-                case 304: $text = 'Not Modified'; break;
-                case 305: $text = 'Use Proxy'; break;
+            case 200: $text = 'OK'; break;
+            case 201: $text = 'Created'; break;
+            case 202: $text = 'Accepted'; break;
+            case 203: $text = 'Non-Authoritative Information'; break;
+            case 204: $text = 'No Content'; break;
+            case 205: $text = 'Reset Content'; break;
+            case 206: $text = 'Partial Content'; break;
 
-                case 400: $text = 'Bad Request'; break;
-                case 401: $text = 'Unauthorized'; break;
-                case 402: $text = 'Payment Required'; break;
-                case 403: $text = 'Forbidden'; break;
-                case 404: $text = 'Not Found'; break;
-                case 405: $text = 'Method Not Allowed'; break;
-                case 406: $text = 'Not Acceptable'; break;
-                case 407: $text = 'Proxy Authentication Required'; break;
-                case 408: $text = 'Request Time-out'; break;
-                case 409: $text = 'Conflict'; break;
-                case 410: $text = 'Gone'; break;
-                case 411: $text = 'Length Required'; break;
-                case 412: $text = 'Precondition Failed'; break;
-                case 413: $text = 'Request Entity Too Large'; break;
-                case 414: $text = 'Request-URI Too Large'; break;
-                case 415: $text = 'Unsupported Media Type'; break;
+            case 300: $text = 'Multiple Choices'; break;
+            case 301: $text = 'Moved Permanently'; break;
+            case 302: $text = 'Moved Temporarily'; break;
+            case 303: $text = 'See Other'; break;
+            case 304: $text = 'Not Modified'; break;
+            case 305: $text = 'Use Proxy'; break;
 
-                case 500: $text = 'Internal Server Error'; break;
-                case 501: $text = 'Not Implemented'; break;
-                case 502: $text = 'Bad Gateway'; break;
-                case 503: $text = 'Service Unavailable'; break;
-                case 504: $text = 'Gateway Time-out'; break; 
-                case 505: $text = 'HTTP Version not supported'; break;
-                default:
-                    // The program you ran is trying to output an Unknown HTTP status code; this is common when using ResponseHelper
-                    exit( 'standard_api_response_001; Unknown http status code "' . htmlentities( $code ) . '"' );
-                break;
-            }
+            case 400: $text = 'Bad Request'; break;
+            case 401: $text = 'Unauthorized'; break;
+            case 402: $text = 'Payment Required'; break;
+            case 403: $text = 'Forbidden'; break;
+            case 404: $text = 'Not Found'; break;
+            case 405: $text = 'Method Not Allowed'; break;
+            case 406: $text = 'Not Acceptable'; break;
+            case 407: $text = 'Proxy Authentication Required'; break;
+            case 408: $text = 'Request Time-out'; break;
+            case 409: $text = 'Conflict'; break;
+            case 410: $text = 'Gone'; break;
+            case 411: $text = 'Length Required'; break;
+            case 412: $text = 'Precondition Failed'; break;
+            case 413: $text = 'Request Entity Too Large'; break;
+            case 414: $text = 'Request-URI Too Large'; break;
+            case 415: $text = 'Unsupported Media Type'; break;
 
-        } else {
-            $code = 200; 
-            $text = 'OK';
+            case 500: $text = 'Internal Server Error'; break;
+            case 501: $text = 'Not Implemented'; break;
+            case 502: $text = 'Bad Gateway'; break;
+            case 503: $text = 'Service Unavailable'; break;
+            case 504: $text = 'Gateway Time-out'; break; 
+            case 505: $text = 'HTTP Version not supported'; break;
+            default:
+                $text = 'unknown';
+            break;
         }
 
-        // Set header
-        http_response_code( $code );
-        
+        return $text; 
+
     }
 
     /**
@@ -98,16 +91,20 @@ class Api_response {
      */
 
     Private static function set_response( $args = array(), string $environment = 'prod' ) {
-      
+
+        $datetime_now = new DateTime( "now", new DateTimeZone( 'US/EASTERN' ) ); 
+        $timestamp = $datetime_now->format( 'Y-m-d H:i:s' );
+
         $default_args = array(
             'error'  => true,
             'status' => 500, 
-            'logged_at' => date( 'Y-m-d H:i:s' ),
+            'logged_at' =>  $timestamp, 
             'system' => array(
                 'issue_id' => 'standard_api_response_003',
                 'log'      => false,
                 'private'  => true,
-                'continue' => true
+                'continue' => true, 
+                'public_data' => false
             ),
             'source'  => get_class(),
             'message' => '',
@@ -116,6 +113,10 @@ class Api_response {
 
         $args = self::array_merge_recursive_distinct( $default_args, $args );
 
+        if( $args[ 'message' ] === '' ) {
+            $args[ 'message' ] = self::get_http_code_message( $args[ 'status' ] );
+        }
+
         // @todo In the future if an API response is private, we need to make sure 
         //       that it is logged with all attributes
         
@@ -123,22 +124,29 @@ class Api_response {
             self::log_response( $args );
         }
 
-        if( 
-            $args[ 'system' ][ 'private' ] === false ||
-            $environment === 'dev'
-        ) {
+        switch(true) {
+            case ( $environment === 'dev' && $args[ 'system' ][ 'private' ] === false ) : 
+                
+                $api_response = $args;
 
-            $api_response = $args;
+                break; 
+            case ( $args[ 'system' ][ 'public_data' ] ) : 
 
-        } else {
+                $api_response = array( 
+                    'status'  => $args[ 'status' ],
+                    'error'   => $args[ 'error' ],
+                    'message' => $args[ 'message' ], 
+                    'data' => $args[ 'data' ]
+                );
 
-            $api_response = array( 
-                'status'  => $args[ 'status' ],
-                'error'   => $args[ 'error' ],
-                'message' => $args[ 'message' ], 
-                'source'  => $args[ 'source' ]
-            );
-
+                break;
+            default : 
+                $api_response = array( 
+                    'status'  => $args[ 'status' ],
+                    'error'   => $args[ 'error' ],
+                    'message' => $args[ 'message' ]
+                );
+                break;
         }
 
         return $api_response; 
@@ -176,7 +184,6 @@ class Api_response {
  
         // Add defaults for Standardized API Response
         $response_data = self::set_response( $response_data, $environment );
-        $response_data[ 'source' ] = ( isset( $response_data[ 'source' ] ) ) ? $response_data[ 'source' ] : 'api_response_005';
  
         // Move response data to the end of the array
         if( isset( $response_data[ 'data' ] ) ) {
@@ -256,7 +263,7 @@ class Api_response {
     Public static function print_json_to_screen( int $response_code, array $response_data, string $environment = 'prod' ) {
 
         // Set headers
-        self::set_http_response_code( $response_code ); 
+        http_response_code( $response_code ); 
         header( 'content-type: application/json' ); 
 
         // Add response headers to response
@@ -333,6 +340,9 @@ class Api_response {
 
     Private static function response_helper( $args = array() ) : array {
 
+        $datetime_now = new DateTime( "now", new DateTimeZone( 'US/EASTERN' ) ); 
+        $timestamp = $datetime_now->format( 'Y-m-d H:i:s' );
+        
         $default_args = array(
             'error'       => true,
             'issue_id'    => 'standard_api_response_004', // string 
@@ -342,6 +352,7 @@ class Api_response {
             'log'         => false,
             'private'     => true,
             'continue'    => true,
+            'public_data' => false,
             'source'      => get_class()
         ); 
 
@@ -350,12 +361,13 @@ class Api_response {
         return array( 
             'status' => $args[ 'status' ],
             'error'  => $args[ 'error' ],
-            'logged_at' => date( 'Y-m-d H:i:s' ),
+            'logged_at' => $timestamp,
             'system' => array(
                 'issue_id' => $args[ 'issue_id' ],
                 'log'      => $args[ 'log' ], 
                 'private'  => $args[ 'private' ], 
-                'continue' => $args[ 'continue' ]
+                'continue' => $args[ 'continue' ], 
+                'public_data' => $args[ 'public_data' ]
             ),
             'source'  => $args[ 'source' ],
             'message' => $args[ 'message' ], 
@@ -397,7 +409,7 @@ class Api_response {
      * ]
      */
 
-    Public static function get_response( $args ) : array {
+    Public static function format_response( $args ) : array {
 
         return self::response_helper( $args );
 
@@ -416,6 +428,59 @@ class Api_response {
             $log_file = fopen( $filename, 'a' );
             fwrite( $log_file, json_encode( $response ) . "\r\n" );
             fclose( $log_file );
+        }
+
+    }
+
+    Public static function on_error( $action, $formatted_response, $env_name = 'prod', $path = '' ) {
+
+        if( $formatted_response[ 'error' ] ) { 
+            
+            switch( $action ) { 
+
+                case 'print_json' : 
+                    self::print_json( 
+                        $formatted_response[ 'status' ], 
+                        $formatted_response, 
+                        $env_name
+                    );
+                    break; 
+                case 'print_json_to_screen' : 
+                    self::print_json( 
+                        $formatted_response[ 'status' ], 
+                        $formatted_response, 
+                        $env_name
+                    );
+                    break; 
+                case 'print_stderr' : 
+                    self::print_stderr( 
+                        $formatted_response, 
+                        $env_name 
+                    );
+                    break; 
+                case 'route_to_custom_page' : 
+                    self::route_to_custom_page(
+                        $formatted_response[ 'status' ], 
+                        $formatted_response, 
+                        $path, 
+                        $env_name
+                    );
+                    break;
+                default : 
+                case 'print_json_to_screen' : 
+                    self::print_json( 
+                        $formatted_response[ 'status' ], 
+                        $formatted_response, 
+                        $env_name
+                    );
+                    break; 
+    
+            }
+
+        } else { 
+        
+            return $formatted_response[ 'data' ];
+
         }
 
     }

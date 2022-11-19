@@ -1,0 +1,83 @@
+{
+    "settings" : {
+        "strict_validation" : false, 
+        "resolver_callback" : "sample_request_callback", 
+        "experimental" : true,
+        "deprecated" : true,
+        "version" : "", 
+        "description" : "",
+        "contact" : {
+            "name" : "", 
+            "url" : "", 
+            "email" : ""
+        }, 
+        "response_codes" : { 
+            "200" : { 
+                "description" : ""
+            }
+        }
+    },
+    "fields" : {
+        "sampleField1" : {
+            "field_validation" : {
+                "required" : true,  
+                "data_type" : "string"
+            }
+        }, 
+        "sampleField2" : {
+            "field_validation" : {
+                "required" : true,  
+                "data_type" : "array"
+            }
+        },
+        "sampleField4" : {
+            "field_validation" : {
+                "required" : true,  
+                "data_type" : "multidimensional_array"
+            }, 
+            "children" : {
+                "sampleField5" : {
+                    "field_validation" : {
+                        "required" : true,
+                        "data_type" : "string"
+                    }
+                }, 
+                "sampleField7" : {
+                    "field_validation" : {
+                        "required" : true,  
+                        "data_type" : "multidimensional_array", 
+                        "children_share_schema" : false, 
+                        "strict_validation" : false
+                    }, 
+                    "children" : {
+                        "sampleField8" : {
+                            "field_validation" : {
+                                "required" : true,  
+                                "data_type" : "string"
+                            }
+                        }, 
+                        "sampleField9" : {
+                            "field_validation" : {
+                                "required" : true,  
+                                "data_type" : "string", 
+                                "regex_expression" : "email"
+                            }
+                        }
+                    }
+                },
+                "sampleField6" : {
+                    "field_validation" : {
+                        "required" : true,  
+                        "data_type" : "string"
+                    }
+                }
+            }
+        },
+        "sampleField3" : {
+            "field_validation" : {
+                "required" : true,
+                "data_type" : "string"
+            }
+        }
+    }
+}

@@ -2,14 +2,14 @@
 
 namespace Bootstrap\Shared\Utilities\Classes;
 
-use Bootstrap\Shared\Utilities\Classes\Api_response as Api_response; 
+use Bootstrap\Shared\Utilities\Classes\Static\Api_response as Api_response; 
 use \Dump_var;
 
 class App_routes {
 
     Private $Response; 
-    Private $app_path; 
-    Private $route; 
+    Private $app_path;
+    Private $routes; 
 
     Public function __construct( array $routes, array $app_path, Api_response $Api_response ) {
 
@@ -40,7 +40,7 @@ class App_routes {
                 $views = $resource[ 'views' ];
                 $view = $views[ $requested_view ];
     
-                $response = $this->Response->get_response([
+                $response = $this->Response->format_response([
                     'status' => 200, 
                     'error' => false,
                     'issue_id' => 'app_routes_003',
@@ -51,7 +51,7 @@ class App_routes {
 
             } else {
 
-                $response = $this->Response->get_response([
+                $response = $this->Response->format_response([
                     'status' => 404,
                     'issue_id' => 'app_routes_005',
                     'message' => 'View not found', 
@@ -62,7 +62,7 @@ class App_routes {
 
         } else {
 
-            $response = $this->Response->get_response([
+            $response = $this->Response->format_response([
                 'status' => 404,
                 'issue_id' => 'app_routes_004',
                 'message' => 'Resource not found', 
@@ -88,7 +88,7 @@ class App_routes {
 
             $app_routes = $this->routes[ $this->app_path[ 'application' ] ]; 
 
-            $response = $this->Response->get_response([
+            $response = $this->Response->format_response([
                 'status' => 200, 
                 'error' => false,
                 'issue_id' => 'app_routes_001',
@@ -99,7 +99,7 @@ class App_routes {
 
         } else {
 
-            $response = $this->Response->get_response([
+            $response = $this->Response->format_response([
                 'status' => 404,
                 'issue_id' => 'app_routes_002',
                 'message' => 'Application not found', 

@@ -1,0 +1,18 @@
+{
+    "sampleField1_response" : {
+        "field_meta" : {
+            "response_field_name" : "", 
+            "resolver_callback" : "sample_response_callback", 
+            "parent_field" : "" 
+        }, 
+        "field_validation" : {
+            "required" : false, 
+            "default_value" : "", 
+            "data_type" : "string", 
+            "content_length" : -1, 
+            "max_content_length" : -1, 
+            "min_content_length" : -1, 
+            "regex_validation" : ""
+        }
+    }
+}
