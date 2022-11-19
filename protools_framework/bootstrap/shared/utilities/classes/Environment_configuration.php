@@ -1,7 +1,6 @@
 <?php 
    
 namespace Bootstrap\Shared\Utilities\Classes;
-use \Dump_var;
 use \Exception;
 use \DateTime; 
 use \DateTimeZone;
@@ -79,8 +78,6 @@ class Environment_configuration {
             'main_site' => '', 
             'static_assets' => '',
             'testing' => '', 
-            'builder' => '', 
-            'cms' => '', 
             'api' => ''
         ),
         'directories' => array()
@@ -138,45 +135,44 @@ class Environment_configuration {
         $domain_name = implode( '.', $full_domain_arr );
 
         // Discover path to environment variable folder.
-        $env_var_path_response = $this->get_env_var_path( $domain );
-
-        if( $env_var_path_response[ 'error' ] ) {
-            throw new Exception( $env_var_path_response[ 'message' ] );
-        } else {
-            $this->env_var_path = $env_var_path_response[ 'data' ][ 'filepath' ];
-        }
-        
+        $env_var_path = $this->Api_response->on_error(
+            'print_json_to_screen', 
+            $this->get_env_var_path( $domain )
+        );
+    
         // Set program root
-        $this->project_root_directory = realpath( $this->env_var_path . '/../' ); 
-
-        // Set site specific directories for Environment Variables, APIs, Assets, Testing, Themes, Portfolio
-        $program_directories_response = $this->get_program_directories( $this->project_root_directory, $domain_name );
-        $domain_key = str_replace( '.', '_', $domain_name ) . '/';
+        $this->project_root_directory = realpath( $env_var_path[ 'filepath' ] . '/../' ); 
         
-        if( $program_directories_response[ 'error' ] ) {
-            throw new Exception( $program_directories_response[ 'message' ] );
-        } else {
-            $this->program_directories = $program_directories_response[ 'data' ][ 'program_directories' ]; 
-        }
+        // Map external domain to program directory
+        $domain_map_response = $this->Api_response->on_error(
+            'print_json_to_screen',
+            $this->map_domain( $domain, $domain_name, $env_var_path[ 'filepath' ] )
+        );
+
+        $domain_directory_name = $domain_map_response[ 'domain_directory_name' ];
 
         // Get environment name
-        $env_domain_filename = $this->env_var_path . '/shared/env_domains.inc'; 
-        $env_name_response = $this->get_env_name( $env_domain_filename, $domain );
-        
-        if( $env_name_response[ 'error' ] ) {
-            throw new Exception( $env_name_response[ 'message' ] );
-        } else {
-            $env_name = $env_name_response[ 'data' ][ 'env_name' ]; 
-        }
+        $env_domain_filename = $env_var_path[ 'filepath' ] . '/shared/env_domains.inc'; 
+        $env_name_response = $this->Api_response->on_error(
+            'print_json_to_screen', 
+            $this->get_env_name( $env_domain_filename, $domain )
+        );
+
+        $env_name = $env_name_response[ 'name' ]; 
 
         // Get environment domains
-        $env_domain_response = $this->get_env_domains( $env_domain_filename, $env_name );
+        $env_domains = $this->Api_response->on_error(
+            'print_json_to_screen', 
+            $this->get_env_domains( $env_domain_filename, $env_name )
+        );
 
-        if( $env_domain_response[ 'error' ] ) {
-            throw new Exception( $env_domain_response[ 'message' ] );
-        } else {
-            $env_domains = $env_domain_response[ 'data' ]; 
-        }
+        // Set site specific directories for Environment Variables, APIs, Assets, Testing, Themes, Portfolio
+        $program_directories_response = $this->Api_response->on_error(
+            'print_json_to_screen', 
+            $this->get_program_directories( $this->project_root_directory,  $domain_directory_name )
+        );
+
+        $this->program_directories = $program_directories_response[ 'program_directories' ];
 
         // Generate clients
         if ( isset( $args[ 'clients' ] ) && !empty( $args[ 'clients' ] ) ) {
@@ -207,6 +203,37 @@ class Environment_configuration {
             'env_domains' => $env_domains[ 'url' ],
             'directories' => $this->program_directories, 
         ));
+
+    }
+
+    /**
+     * Domain map
+     */
+
+    Private function map_domain( string $domain, string $domain_name, string $env_var_path ) {
+
+        $domain_map_filename = $env_var_path . '/shared/domain_map.inc'; 
+
+        if( file_exists( $domain_map_filename ) ) {
+
+            $map = include( $domain_map_filename );
+
+            if ( key_exists( $domain_name, $map ) ) { 
+                $domain_map = $map[ $domain_name ]; 
+                $domain_name = $domain_map[ 'domain_directory_name' ];
+            }
+
+        }
+        
+        return $this->Api_response->format_response(array(
+            'status' => 200, 
+            'error' => false, 
+            'source' => get_class(), 
+            'issue_id' => 'environment_config_16', 
+            'data' => array( 
+                'domain_directory_name' => $domain_name
+            )
+        )); 
 
     }
 
@@ -466,7 +493,7 @@ class Environment_configuration {
                 'message'  => 'Success, environment name found', 
                 'source'   => get_class(), 
                 'data'     => array(
-                    'env_name' => $env_name
+                    'name' => $env_name
                 )
             ) );
 
@@ -554,7 +581,7 @@ class Environment_configuration {
         ) {
 
             $response = $this->Api_response->format_response( array(
-                'status'   => 404,
+                'status'   => 500,
                 'issue_id' => 'environment_config_008', 
                 'message'  => $matching_search_response[ 'message' ] . ' - missing site specific directories', 
                 'source'   => get_class()
@@ -595,7 +622,7 @@ class Environment_configuration {
 
                     case 'portfolio' : 
                         $program_directories[ 'portfolio' ][ 'site_specific' ] = $directory . '/' . $domain_dir;
-                        $program_directories[ 'portfolio' ][ 'shared' ] = $directory . '/shared/api/'; 
+                        $program_directories[ 'portfolio' ][ 'shared' ] = $directory . '/shared/'; 
                         break;
 
                     case 'tmp' : 
