@@ -777,7 +777,7 @@ class Environment_configuration {
         );
 
         if( $this->is_cli() ) { 
-        
+            
             $meta = array(
                 'method' => 'cli', 
                 'data' => $this->parse_args( $_SERVER[ 'argv' ][ 1 ] ), 
@@ -805,21 +805,25 @@ class Environment_configuration {
 
         }
 
-        if( $_SERVER[ 'REQUEST_METHOD' ] === 'GET' ) {
+        if( !$this->is_cli() ) {
 
-            $meta = array( 
-                'headers' => $this->get_request_header(),
-                'data' => $_GET
-            );
+            if( $_SERVER[ 'REQUEST_METHOD' ] === 'GET' ) {
+
+                $meta = array( 
+                    'headers' => $this->get_request_header(),
+                    'data' => $_GET
+                );
+                
+            } else {
+                
+                // Expecting JSON in the body not form data
+                $meta = array( 
+                    'headers' => $this->get_request_header(),
+                    'data' => urldecode( file_get_contents( 'php://input' ) ) 
+                );  
             
-        } else {
-            
-            // Expecting JSON in the body not form data
-            $meta = array( 
-                'headers' => $this->get_request_header(),
-                'data' => urldecode( file_get_contents( 'php://input' ) ) 
-            );  
-        
+            }
+
         }
 
         $request_meta = array_merge( $request_meta, $meta );

@@ -32,7 +32,6 @@ $report = $Test_plan->get_test_report();
 
 if( !IS_CLI ) {
     set_time_limit(0);
-
     ob_start();
     header ( 'Location: /results?execution_id=' . $report[ 'data' ][ 'summary' ][ 'execution_id' ] );
     ob_end_flush();
@@ -47,7 +46,6 @@ if(
     isset( $request_params[ 'data' ][ 'verbose' ] ) &&
     $request_params[ 'data' ][ 'verbose' ] === 'false'
 ) {
-    printf( 'done' );
     exit;
 }
 
