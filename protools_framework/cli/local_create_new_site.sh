@@ -2,12 +2,15 @@ source ~/.bash_profile
 sites_dir=~/sites
 protools_framework_dir=$sites_dir/_prototypes/protools_framework
 
-# Sites need the following folders and assets
+# Sites need the following folders and assets (most can be left empty)
 
-# environment_variables  
+# environment_variables 
 #     - site specific 
-#     - shared 
-#     - developer specific 
+#     - shared (cannot be empty; acts a fall back for all sites)
+        # - Contains 
+        #     - data_source.inc
+        #     - env_domains.inc
+#     - developer specific
 
 # file_storage 
 #     - site specific 
@@ -24,3 +27,4 @@ protools_framework_dir=$sites_dir/_prototypes/protools_framework
 # tmp directories 
 #     - site specific 
 #     - shared
+

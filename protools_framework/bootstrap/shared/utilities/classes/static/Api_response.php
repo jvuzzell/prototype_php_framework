@@ -4,7 +4,6 @@ namespace Bootstrap\Shared\Utilities\Classes\Static;
 
 use \DateTime; 
 use \DateTimeZone;
-use \Dump_var;
 
 /** 
  * @package Standard_api_response
@@ -95,13 +94,13 @@ class Api_response {
         $datetime_now = new DateTime( "now", new DateTimeZone( 'US/EASTERN' ) ); 
         $timestamp = $datetime_now->format( 'Y-m-d H:i:s' );
 
-        $default_args = array(
+        $default_args = array( 
             'error'  => true,
             'status' => 500, 
             'logged_at' =>  $timestamp, 
             'system' => array(
                 'issue_id' => 'standard_api_response_003',
-                'log'      => false,
+                'log'      => true,
                 'private'  => true,
                 'continue' => true, 
                 'public_data' => false
@@ -180,11 +179,11 @@ class Api_response {
      * @param string $internal_path
      */
 
-    Public static function route_to_custom_page( int $response_code, array $response_data, string $internal_path, string $environment = 'prod' ) {
- 
+    Public static function route_to_custom_page( int $response_code, array $response_data, string $url, string $environment = 'prod' ) {
+
         // Add defaults for Standardized API Response
         $response_data = self::set_response( $response_data, $environment );
- 
+        
         // Move response data to the end of the array
         if( isset( $response_data[ 'data' ] ) ) {
             $data = $response_data[ 'data' ];
@@ -192,8 +191,26 @@ class Api_response {
             $response_data[ 'data' ] = $data;
         }
 
-        include( $internal_path );
-        
+        if ( headers_sent() ) {
+            
+            // \dump_var::print( $url );
+            // function redirect($url) {
+            //     $string = '<script type="text/javascript">';
+            //     $string .= '(function(){ window.location = "' . $url . '"})()';
+            //     $string .= '</script>';
+            
+            //     echo $string;
+            // }
+
+            // // redirect( $url );
+
+        } else {
+
+            $_SESSION[ 'last_system_error' ] = $response_data; 
+            header( "Location: $url" );
+
+        }
+
         die(); 
 
     }
@@ -462,8 +479,8 @@ class Api_response {
                     self::route_to_custom_page(
                         $formatted_response[ 'status' ], 
                         $formatted_response, 
-                        $path, 
-                        $env_name
+                        $env_name,
+                        $path
                     );
                     break;
                 default : 

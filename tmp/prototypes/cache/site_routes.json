@@ -1,0 +1,12 @@
+{
+    "example" : {
+        "resources" : {
+            "default" : {
+                "views" : {
+                    "default" : "example/resources/page_example/app.php"
+                }
+            } 
+        }
+    }
+}
+

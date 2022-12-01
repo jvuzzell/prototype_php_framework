@@ -45,6 +45,7 @@ function universal_exception_handler( $exception ) {
             Api_response::print_json_to_screen( 500, $exception_response, debug_env );
             break; 
         default : 
+
             Api_response::route_to_custom_page( 500, $exception_response, ERROR_PAGE, ENV_NAME ); 
             break;
     }

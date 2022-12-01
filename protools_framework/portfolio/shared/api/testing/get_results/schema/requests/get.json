@@ -1,0 +1,22 @@
+{
+    "settings" : {
+        "strict_validation" : true, 
+        "resolver_callback" : "get_results", 
+        "experimental" : true,
+        "deprecated" : false,
+        "version" : "1.0", 
+        "response_codes" : { 
+            "200" : { 
+                "description" : ""
+            }
+        }
+    },
+    "fields" : {
+        "execution_id" : {
+            "field_validation" : {
+                "required" : true,  
+                "data_type" : "string"
+            }
+        }
+    }
+}

@@ -3,7 +3,6 @@
 namespace Bootstrap\Api_gateway\Library\Classes;
 
 use Bootstrap\Api_gateway\Library\Classes\Api_schema; 
-use \Dump_var;
 use ErrorException;
 
 class Api_resolver extends Api_schema {
@@ -22,7 +21,7 @@ class Api_resolver extends Api_schema {
         $this->api_response = $args[ 'api_response' ];
 
         // Schema Parent Class
-        parent::__construct( $args[ 'schema' ] );
+        parent::__construct( $args[ 'schema' ], $this->api_response );
 
         // @TODO: eventually check for cached responses and return that instead
 

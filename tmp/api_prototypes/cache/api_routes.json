@@ -1,4 +1,23 @@
 {
+    "error" : {
+        "uri" : "error", 
+        "directory" : "error_page", 
+        "version" : "1.0", 
+        "title" : "Error Page", 
+        "description" : "Displays error data to client",
+        "reference_url" : "", 
+        "contact" : {
+            "name" : "Joshua Uzzell", 
+            "url" : "", 
+            "email" : ""
+        }, 
+        "tags" : [ "error page" ], 
+        "request_methods" : {
+            "get" : {
+                "permission_type" : "none"
+            }
+        }     
+    },
     "sample_api" : {
         "uri" : "sample_api", 
         "directory" : "sample_api", 
@@ -43,7 +62,7 @@
         }
     }, 
     "jwt_get_claims" : {
-        "uri" : "jwt/get_claims", 
+        "uri" : "jwt/get-claims", 
         "directory" : "jwt/get_claims", 
         "version" : "1.0", 
         "title" : "JWT Get Claims", 
@@ -55,6 +74,23 @@
         "tags" : [ "administration", "permissions", "jwt" ],
         "request_methods" : {
             "post" : {
+                "permission_type" : "localhost"
+            }
+        }
+    }, 
+    "test_get_results" : {
+        "uri" : "test/get-results", 
+        "directory" : "testing/get_results", 
+        "version" : "1.0", 
+        "title" : "Get Test Results", 
+        "contact" : {
+            "name" : "Joshua Uzzell", 
+            "url" : "", 
+            "email" : ""
+        }, 
+        "tags" : [ "testing", "acceptance criteria" ],
+        "request_methods" : {
+            "get" : {
                 "permission_type" : "localhost"
             }
         }

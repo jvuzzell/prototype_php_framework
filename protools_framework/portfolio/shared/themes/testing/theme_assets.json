@@ -1,0 +1,42 @@
+{
+    "css" : {
+        "Reset_CSS" : { "asset_path" : "styles/reset.css", "extract" : true, "minify" : true, "in_footer" : false },
+        "Standard_Grid_CSS" : { "asset_path" : "styles/grid.css" , "extract" : true, "minify" : true, "in_footer" : false },
+        "Margin_Padding_CSS" : { "asset_path" : "styles/margin-padding.css", "extract" : true, "minify" : true, "in_footer" : false },
+        "Button_Anchor_CSS" : { "asset_path" : "styles/button-anchors.css", "extract" : true, "minify" : true, "in_footer" : false }, 
+        "Color_Palette_CSS" : { "asset_path" : "styles/color-palette.css" , "extract" : true, "minify" : true, "in_footer" : false }, 
+        "Font_Css" : { "asset_path" : "styles/font.css", "extract" : true, "minify" : true, "in_footer" : false }, 
+        "Icon_CSS" : { "asset_path" : "styles/icons.css", "extract" : true, "minify" : true, "in_footer" : false }, 
+        "Standard_Forms_CSS" : { "asset_path" : "styles/form.css", "extract" : true, "minify" : true, "in_footer" : false }, 
+        "Main_CSS" : { "asset_path" : "styles/main.css", "extract" : true, "minify" : true, "in_footer" : false }
+    },
+
+    "plugin_css" : {
+        "Expandables_CSS" : { "asset_path" : "plugins/expandables-js/expandables.css", "extract" : true, "minify" : true, "in_footer" : false },  
+        "Flyout_CSS" : { "asset_path" : "plugins/expandables-js/expandables.css", "extract" : true, "minify" : true, "in_footer" : false },  
+        "Popup_CSS" : { "asset_path" : "plugins/expandables-js/expandables.css", "extract" : true, "minify" : true, "in_footer" : false },  
+        "Tabulator_CSS" : { "asset_path" : "plugins/vendor/tabulator/dist/css/tabulator.min.css", "extract" : true, "minify" : true, "in_footer" : false },  
+        "Table_Styles" : { "asset_path" : "styles/tables-style.css", "extract" : true, "minify" : true, "in_footer" : false },  
+        "System_Alert_CSS" : { "asset_path" : "plugins/system-alert-js/system-alert.css", "extract" : true, "minify" : true, "in_footer" : false }, 
+        "Chart_JS_CSS" : { "asset_path" : "plugins/chart-js/chart.css", "extract" : true, "minify" : true, "in_footer" : false },
+        "Tab_CSS" : { "asset_path" : "plugins/tab-js/tab.css", "extract" : true, "minify" : true, "in_footer" : false },
+        "Form_Validation_CSS" : { "asset_path" : "plugins/form-validation/validation.css", "extract" : true, "minify" : true, "in_footer" : false }
+    }, 
+
+    "plugin_js" : {
+        "Polyfills" : { "asset_path" : "plugins/polyfills.js", "extract" : true, "minify" : true, "in_footer" : false },
+        "JsHelper" : { "asset_path" : "plugins/JsHelper.js", "extract" : true, "minify" : true, "in_footer" : false},
+        "Run_to_Start_App_JS" : { "asset_path" : "plugins/app-start-js/run-to-start-app.js", "extract" : true, "minify" : true, "in_footer" : false },
+        "Common_JS" : { "asset_path" : "plugins/common.js", "extract" : true, "minify" : true, "in_footer" : true },
+        "Expandables_JS" : { "asset_path" : "plugins/expandables-js/expandables.js", "extract" : true, "minify" : true, "in_footer" : true }, 
+        "Flyouts_JS" : { "asset_path" : "plugins/flyout-js/flyout.js", "extract" : true, "minify" : true, "in_footer" : true }, 
+        "PopUps_JS" : { "asset_path" : "plugins/popup-js/popup.js", "extract" : true, "minify" : true, "in_footer" : true },
+        "System_Alert_JS" : { "asset_path" : "plugins/system-alert-js/system-alert.js", "extract" : true, "minify" : true, "in_footer" : true },
+        "HTML5_Validator_JS" : { "asset_path" : "plugins/form-validation/HTML5validation.js", "extract" : true, "minify" : true, "in_footer" : true },   
+        "Standard_Application_JS" : { "asset_path" : "plugins/plugin_gaea-js/StandardApplicationDesign.js", "extract" : true, "minify" : true, "in_footer" : true }, 
+        "Standard_Module_JS" : { "asset_path" : "plugins/plugin_gaea-js/StandardModuleDesign.js", "extract" : true, "minify" : true, "in_footer" : true }, 
+        "Base_App_JS" : { "asset_path" : "plugins/plugin_gaea-js/RegisterBaseApp.js", "extract" : true, "minify" : true, "in_footer" : true }, 
+        "Tabulator_JS" : { "asset_path" : "plugins/vendor/tabulator/dist/js/tabulator.min.js", "extract" : true, "minify" : true, "in_footer" : true },
+        "Global_Tabulator_Namespace" : { "asset_path" : "plugins/globalTabulatorNamespace.js", "extract" : true, "minify" : true, "in_footer" : true }
+    }
+}

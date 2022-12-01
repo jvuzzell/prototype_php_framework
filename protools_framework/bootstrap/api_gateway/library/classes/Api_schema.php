@@ -2,8 +2,8 @@
 
 namespace Bootstrap\Api_gateway\Library\Classes;
 
+use Bootstrap\Shared\Utilities\Classes\Static\Api_response;
 use Symfony\Component\OptionsResolver\OptionsResolver as Options_resolver;
-use \Dump_var;
 use ErrorException;
 
 class Api_schema {
@@ -101,7 +101,15 @@ class Api_schema {
         ]
     ];
 
-    Public function __construct( array $schema ) {
+    Public function __construct( array $schema = null, Api_response $api_response = null ) {
+
+        if( $schema !== null && $api_response !== null ) { 
+            $this->set_schema( $schema, $api_response );
+        }
+
+    }   
+
+    Public function set_schema( array $schema, Api_response $api_response ) { 
 
         $this->schema_settings_resolver = new Options_resolver;
         $this->configure_schema_settings( $this->schema_settings_resolver );
@@ -110,19 +118,20 @@ class Api_schema {
         $this->schema_field_resolver = new Options_resolver; 
         $this->configure_field_options( $this->schema_field_resolver ); 
 
+        $this->api_response = $api_response;
         $this->schema_settings = $schema[ 'settings' ];
         $this->schema_fields = $this->validate_schema( $schema[ 'fields' ] );
 
-    }   
+
+    }
 
     Public function configure_schema_settings( Options_resolver $schema_settings_resolver ) {
-
 
         $schema_settings_resolver->setDefault( 'settings', function( Options_resolver $settings_resolver ) {
 
             $settings_resolver
                 ->setDefaults([
-                        'strict_validation' => true, 
+                        'strict_validation' => false, 
                         'resolver_callback' => null, 
                         'version' => "0.1", 
                         'experimental' => true, 
@@ -137,7 +146,8 @@ class Api_schema {
                 ->setAllowedTypes( 'version', 'string' )
                 ->setAllowedTypes( 'experimental', 'boolean' )
                 ->setAllowedTypes( 'deprecated', 'boolean' )
-                ->setAllowedTypes( 'description', 'string' );
+                ->setAllowedTypes( 'description', 'string' )
+            ;
 
                 $settings_resolver->setDefault( 'contact', function( Options_resolver $contact_resolver ) {
                     $contact_resolver
@@ -183,9 +193,9 @@ class Api_schema {
                 $field_validation_resolver
                     ->setDefaults([
                             'required' => false, 
-                            'default_value' => '', 
                             'data_type' => 'string',
                             'types_in_array' => 'string', 
+                            'default_value' => "",
                             'content_length' => null, 
                             'max_content_length' => 256, 
                             'min_content_length' => 0, 
@@ -202,7 +212,7 @@ class Api_schema {
                     ->setAllowedTypes( 'regex_expression', 'string' )
                     ->setAllowedTypes( 'children_share_schema', 'boolean' )
                     ->setAllowedTypes( 'default_value', [
-                        'null', 'string', 'bool', 'boolean', 
+                        'string', 'bool', 'boolean', 
                         'int', 'integer', 'long', 'float', 
                         'double', 'real', 'numeric', 
                         'array'
@@ -273,8 +283,8 @@ class Api_schema {
     }
 
     Public function validate_request_body( array $request_data, array $schema_fields = array() ) {
-       
-        $response = array(); 
+   
+        $response = array( 'status' => 200, 'error' => false ); 
         $regex_and_content_length_accepted_types = array(
             'string', 
             'integer', 
@@ -296,16 +306,12 @@ class Api_schema {
 
                 if( !key_exists( $request_field_key, $schema_fields ) ) { 
     
-                    $this->api_response->print_json_to_screen( 
-                        406, 
-                        $this->api_response->format_response( 
-                            array(
-                                'status' => 406, 
-                                'message' => "Invalid request field; not present in schema - $request_field_key", 
-                                'issue_id' => 'api_schema_011',
-                                'source' => get_class( $this )
-                            )
-                        ) 
+                    return $this->api_response->format_response(array(
+                            'status' => 406, 
+                            'message' => "Invalid request field; not present in schema - $$request_field_key", 
+                            'issue_id' => 'api_schema_011',
+                            'source' => get_class( $this )
+                        )
                     );
 
                 }
@@ -323,38 +329,74 @@ class Api_schema {
             $content_length = $field_constraints[ 'field_validation' ][ 'content_length' ]; 
             $min_content_length = $field_constraints[ 'field_validation' ][ 'min_content_length' ]; 
             $max_content_length = $field_constraints[ 'field_validation' ][ 'max_content_length' ];
+            $default_value = $field_constraints[ 'field_validation' ][ 'default_value' ];
 
             // Validate field exists
-            $field_found_in_request = $this->api_response->on_error(
-                'print_json_to_screen',
-                $this->assert_field_in_request( $schema_field_key, $request_data, $field_required )
-            );
+            $field_found_in_request_response = $this->assert_field_in_request( 
+                                            $schema_field_key,
+                                            $request_data, 
+                                            $field_required, 
+                                            $default_value
+                                        );  
             
-            if( $field_found_in_request[ 'found' ] == false ) {
-                // @todo - Is there a default??
-                continue; // Go to the next field without processing this one further
+            if( $field_found_in_request_response[ 'error' ] ) {
+                return $field_found_in_request_response; 
+            } else { 
+                $field_found_in_request = $field_found_in_request_response[ 'data' ];
+            }
+
+            if( $field_found_in_request[ 'found' ] === false ) {
+
+                if( $field_found_in_request[ 'replace_with_default' ] ) {
+                    
+                    if( $default_value !== null ) { 
+                        $response = $this->api_response->format_response(array(
+                            'status' => 500, 
+                            'message' => 'Field missing in request and default not provided - ', 
+                            'log' => true, 
+                            'private' => true, 
+                            'source' => get_class(), 
+                            'issue_id' => 'api_schema_021'
+                        ));
+                        break; 
+                    } else { 
+                        $request_data[ $schema_field_key ] = $default_value;
+                    }
+
+                } else {
+                    continue; // Go to the next field without processing this one further
+                }
+
             }
 
             // Validate data type
-            $request_field_data_type = $this->api_response->on_error(
-                'print_json_to_screen', 
-                $this->assert_data_type( $expected_data_type, $schema_field_key, $request_data[ $schema_field_key ] )
-            );
+            $request_field_data_type_response =  $this->assert_data_type( 
+                                                        $expected_data_type, 
+                                                        $schema_field_key, 
+                                                        $request_data[ $schema_field_key ] 
+                                                    );
 
+            if( $request_field_data_type_response[ 'error' ] ) {
+                return $request_field_data_type_response; 
+            } else { 
+                $request_field_data_type = $request_field_data_type_response[ 'data' ];
+            }
+                                        
             // Validate content length 
             if (
                     $content_length !== null && 
                     in_array( $expected_data_type, $regex_and_content_length_accepted_types )
             ) {
 
-                $this->api_response->on_error( 
-                    'print_json_to_screen',
-                    $this->assert_content_length( 
-                        $content_length, 
-                        $schema_field_key, 
-                        $request_data[ $schema_field_key ] 
-                    ) 
+                $response = $this->assert_content_length( 
+                    $content_length, 
+                    $schema_field_key, 
+                    $request_data[ $schema_field_key ] 
                 );
+
+                if( $response[ 'error' ] ) {
+                    return $response; 
+                }
 
             }
 
@@ -365,14 +407,15 @@ class Api_schema {
                     in_array( $expected_data_type, $regex_and_content_length_accepted_types )
             ) {
 
-                $this->api_response->on_error( 
-                    'print_json_to_screen',
-                    $this->assert_min_content_length( 
-                        $min_content_length, 
-                        $schema_field_key, 
-                        $request_data[ $schema_field_key ] 
-                    ) 
+                $response = $this->assert_min_content_length( 
+                    $min_content_length, 
+                    $schema_field_key, 
+                    $request_data[ $schema_field_key ] 
                 );
+
+                if( $response[ 'error' ] ) {
+                    return $response; 
+                }
 
             }
 
@@ -383,14 +426,15 @@ class Api_schema {
                     in_array( $expected_data_type, $regex_and_content_length_accepted_types )
             ) {
       
-                $this->api_response->on_error( 
-                    'print_json_to_screen',
-                    $this->assert_max_content_length( 
-                        $max_content_length, 
-                        $schema_field_key, 
-                        $request_data[ $schema_field_key ] 
-                    ) 
+                $response = $this->assert_max_content_length( 
+                    $max_content_length, 
+                    $schema_field_key, 
+                    $request_data[ $schema_field_key ] 
                 );
+
+                if( $response[ 'error' ] ) {
+                    return $response; 
+                }
 
             }
 
@@ -404,10 +448,15 @@ class Api_schema {
                 ) 
             ) {
 
-                $this->api_response->on_error( 
-                    'print_json_to_screen',
-                    $this->assert_regex_match( $regex_expression, $schema_field_key, $request_data[ $schema_field_key ] ) 
-                );
+                $response = $this->assert_regex_match( 
+                    $regex_expression, 
+                    $schema_field_key, 
+                    $request_data[ $schema_field_key ] 
+                ); 
+
+                if( $response[ 'error' ] ) {
+                    return $response; 
+                }
 
             }
 
@@ -427,10 +476,15 @@ class Api_schema {
                 $request_field_data_type[ 'type' ] === 'array' 
             ) { 
 
-                $this->api_response->on_error(
-                    'print_json_to_screen', 
-                    $this->assert_type_of_array( $field_constraints[ 'field_validation' ][ 'types_in_array' ], $schema_field_key, $request_data[ $schema_field_key ] )
+                $response = $this->assert_type_of_array( 
+                    $field_constraints[ 'field_validation' ][ 'types_in_array' ], 
+                    $schema_field_key, 
+                    $request_data[ $schema_field_key ] 
                 );
+
+                if( $response[ 'error' ] ) {
+                    return $response; 
+                }
 
             } 
 
@@ -559,7 +613,7 @@ class Api_schema {
      * assert_field_exists
      */
 
-    Public function assert_field_in_request( $request_field_key = '', $request_data = array(), $is_required = false ) {
+    Public function assert_field_in_request( string $request_field_key = '', array $request_data = array(), bool $is_required = false, mixed $default_value = null ) {
 
         $response = array();
 
@@ -567,6 +621,19 @@ class Api_schema {
 
         switch( true ) {
              
+            case ( $is_required && !$field_found && $default_value !== null ) :
+
+                $response = $this->api_response->format_response( array(
+                    'status' => 201, 
+                    'error' => false,
+                    'message' => "Replace field with default - $request_field_key", 
+                    'issue_id' => 'api_schema_003',
+                    'source' => get_class( $this ), 
+                    'data' => array( 'found' => false, 'replace_with_default' => true )
+                ));
+
+                break; 
+
             case ( $is_required && !$field_found ) :
 
                 $response = $this->api_response->format_response( array(
@@ -586,7 +653,7 @@ class Api_schema {
                     'message' => "Missing field not required - $request_field_key", 
                     'issue_id' => 'api_schema_004',
                     'source' => get_class( $this ), 
-                    'data' => array( 'found' => false )
+                    'data' => array( 'found' => false, 'replace_with_default' => false )
                 ));
 
                 break;
@@ -599,7 +666,7 @@ class Api_schema {
                     'message' => "Found field - $request_field_key", 
                     'issue_id' => 'api_schema_005',
                     'source' => get_class( $this ), 
-                    'data' => array( 'found' => true )
+                    'data' => array( 'found' => true, 'replace_with_default' => false )
                 ));
 
                 break;
@@ -777,7 +844,7 @@ class Api_schema {
                     
                     $response = $this->api_response->format_response( array(
                         'status' => 406, 
-                        'message' => "Invalid request field; not present in schema - $child_key", 
+                        'message' => "Invalid request field; not present in schema - $$child_key", 
                         'issue_id' => 'api_schema_010',
                         'source' => get_class( $this )
                     ));

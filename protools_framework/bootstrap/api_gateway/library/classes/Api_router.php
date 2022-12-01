@@ -6,7 +6,7 @@ use Bootstrap\Shared\Utilities\Classes\Environment_configuration as Environment_
 use Bootstrap\Shared\Utilities\Classes\Json_validator;
 use Bootstrap\Shared\Utilities\Classes\Static\Api_response;
 use Symfony\Component\OptionsResolver\OptionsResolver as Options_resolver;
-use \Dump_var;
+
 use ErrorException;
 
 class Api_router {
@@ -101,7 +101,7 @@ class Api_router {
                 $response = $this->api_response::format_response([
                     'status' => 200, 
                     'error' => false,
-                    'message' => 'Page not found', 
+                    'message' => 'Endpoint found', 
                     'source' => get_class( $this ), 
                     'issue_id' => 'api_router_006', 
                     'data' => $route_data
@@ -118,7 +118,7 @@ class Api_router {
 
             $response = $this->api_response::format_response([
                 'status' => 404, 
-                'message' => 'Page not found', 
+                'message' => 'Endpoint not found', 
                 'source' => get_class( $this ), 
                 'issue_id' => 'api_router_002'
             ]);

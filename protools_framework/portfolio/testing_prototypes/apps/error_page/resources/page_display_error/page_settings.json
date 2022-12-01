@@ -1,0 +1,8 @@
+{
+    "theme" : "testing",
+    "template" : "template.html.twig", 
+    "template_directory" : "error_page", 
+    "page_meta" : {
+        "title" : "Status"
+    }
+}

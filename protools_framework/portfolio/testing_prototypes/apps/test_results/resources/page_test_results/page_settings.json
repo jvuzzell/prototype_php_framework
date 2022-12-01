@@ -1,4 +1,33 @@
 {
-    "theme" : "common",
-    "template" : "test_results/template.html.twig"
+    "theme" : "testing",
+    "template" : "template.html.twig",
+    "template_directory" : "spa_test_results", 
+    "page_meta" : {
+        "title" : "Test Results"
+    },
+    "components" : {
+        "mod_standard_theme_container" : {
+            "assets_path" : [ "mod_standard_theme_container" ], 
+            "data_source" : [{
+                "api" : {
+                    "render_server_side" : true, 
+                    "publish_to_page_model" : true,
+                    "client_name" : "protools_api",
+                    "endpoint_uri" : "test/get-results/",
+                    "request_method" : "GET",
+                    "input_request_parameters" : {
+                        "fields" : {
+                            "execution_id" : {
+                                "field_validation" : {
+                                    "required" : true,  
+                                    "data_type" : "string",  
+                                    "max_content_length" : 1024
+                                }
+                            }
+                        }
+                    }
+                }
+            }]
+        }
+    }
 }

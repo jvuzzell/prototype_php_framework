@@ -5,7 +5,6 @@ namespace Bootstrap\Api_gateway\Library\Classes;
 use Bootstrap\Shared\Utilities\Classes\Static\Api_response;
 use Firebase\JWT\JWT as Firebase_jwt;
 use Firebase\JWT\Key;
-use \Dump_var;
 
 class Jwt_management {
 

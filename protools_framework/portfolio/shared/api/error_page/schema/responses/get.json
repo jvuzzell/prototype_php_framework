@@ -1,0 +1,14 @@
+{
+    "settings" : {
+        "strict_validation" : false, 
+        "resolver_callback" : "output_error", 
+        "experimental" : true,
+        "deprecated" : false,
+        "version" : "1.0", 
+        "response_codes" : { 
+            "200" : { 
+                "description" : ""
+            }
+        }
+    }
+}

@@ -1,0 +1,22 @@
+{% include 'mod_header/component.html.twig' %}
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="content-lock">
+
+            <!-- Error Content -->
+            <div class="404-error has-mg-top-30">
+                <div class="h-row">
+                    <div class="v-col">
+                        <h1>Oops! System error has occurred.</h1>
+                        <h2>{{ system_error.status }} - {{ system_error.message }}</h3>
+                        <p>If this screen persists, please contact your account manager.</p>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    <!-- End Main Content -->
+
+{% include 'mod_footer/component.html.twig' %}

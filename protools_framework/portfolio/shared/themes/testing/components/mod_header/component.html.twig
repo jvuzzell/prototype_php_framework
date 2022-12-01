@@ -1,0 +1,14 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1, maximum-scale=1">
+        <title>({{ environment.env_name|upper }}) - {{ system_error.status }} {{ page_meta.title }}</title>
+
+        <link rel="icon" type="image/png" href="{{ environment.request.base_url }}/favicon.png">
+        <link rel="icon" type="image/x-icon" href="{{ environment.request.base_url }}/favicon.ico">
+
+        {{ minified_css | raw }}
+        <script>{{ minified_header_js | raw }}</script>
+    </head>
+    <body>

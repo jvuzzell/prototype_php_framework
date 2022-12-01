@@ -7,7 +7,6 @@ require_once( SHARED_LIBRARY_DIR . '/utilities/functions/generate_random_string.
 use Bootstrap\Api_gateway\Library\Classes\Api_router as Api_router;
 use Bootstrap\Api_gateway\Library\Classes\Api_handler as Api_handler;
 use Bootstrap\Shared\Utilities\Classes\Static\Api_response as Api_response; 
-use Bootstrap\Api_gateway\Library\Classes\Jwt_authorization as Jwt_authorization;
 use Bootstrap\Api_gateway\Library\Classes\User_authorization;
 
 $request_method = strtolower( ENV_VAR[ 'request' ][ 'method' ] ); 

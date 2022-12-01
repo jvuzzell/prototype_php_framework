@@ -1,5 +1,7 @@
 <?php 
 
+session_start();
+
 require_once( __DIR__ . '/../../../vendor/autoload.php' );
 require_once( __DIR__ . '/../../autoload.php' );
 
@@ -116,7 +118,7 @@ if( !IS_CLI ) {
     }
 
     if ( ! defined( 'ERROR_PAGE' ) ) {
-        define( 'ERROR_PAGE', SITE_DIR .'/error_page.php' );
+        define( 'ERROR_PAGE', SITE_URL .'/error/' );
     }    
 
     if ( !defined( 'SHARED_PORTFOLIO_DIR' ) ) {

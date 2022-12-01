@@ -1,10 +1,12 @@
 <?php  
 namespace Portfolio\Testing_Prototypes\Apps\Test_Results\Resources\Page_Test_Results;
 
-use \Dump_var;
+$namespace = str_replace( ENV_VAR[ 'directories' ][ 'framework' ], '', __DIR__ );
+$namespace = str_replace( '/', '\\', $namespace ); 
 
-$page_controls_classname = 'Portfolio\Testing_Prototypes\Apps\Test_Results\Resources\Page_Test_Results\Page_controls';
-$page_controls_location = __DIR__ . '/Page_controls.php'; 
+$page_model_classname = $namespace . '\Page_model';
+$page_controls_classname = $namespace . '\Page_controls';
+$page_controls_location = __DIR__ . '/Page_controls.php';
 
 include( ENV_VAR[ 'directories' ][ 'portfolio' ][ 'shared' ] . 'library/bootstrap_page_config.php' );
 
@@ -14,10 +16,6 @@ switch( ENV_VAR[ 'request' ][ 'method' ] ) {
         $Page->display();
         break;
 }
-
-
-
-
 
 // $display_env_variable = ( ENV_NAME !== 'prod' ) ? "(" . strtoupper( ENV_NAME ) . ")" : '';
 

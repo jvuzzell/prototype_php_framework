@@ -2,6 +2,7 @@
 
 require( $page_controls_location );
 
+use Bootstrap\Api_gateway\Library\Classes\Api_schema;
 use Bootstrap\Shared\Utilities\Classes\Static\Api_response as Api_response;
 use Bootstrap\Shared\Utilities\Classes\Json_validator as Json_validator;
 use Bootstrap\Shared\Controllers\Page_controller as Page_controller; 
@@ -27,11 +28,12 @@ $twig_options = array(
 $Page = new Page_controller ( 
     new $page_controls_classname(
         $Environment_config,
-        new Model,
+        new $page_model_classname,
         new Properties, 
         new Twig_environment( new Twig_filesystem_loader(), $twig_options ), 
         new Api_response, 
         new Json_validator, 
-        new Settings
+        new Settings,
+        new Api_schema
     )
 );

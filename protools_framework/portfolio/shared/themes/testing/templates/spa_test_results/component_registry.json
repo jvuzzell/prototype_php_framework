@@ -1,0 +1,16 @@
+{
+    "components" : {
+        "mod_header" : {
+            "assets_path" : [ "mod_header" ]
+        }, 
+        "mod_footer" : {
+            "assets_path" : [ "mod_footer" ]
+        },
+        "mod_standard_theme_container" : {
+            "assets_path" : [ "mod_standard_theme_container" ]
+        }, 
+        "mod_report_header" : {
+            "assets_path" : [ "mod_report_header" ]
+        }
+    }
+}

@@ -3,8 +3,9 @@
 namespace Bootstrap\Shared\Utilities\Classes;
 
 use Bootstrap\Shared\Utilities\Classes\Static\Api_response as Api_response;
-use \Exception;
 use Dump_var;
+use \Exception;
+
 
 /**
  * cURL client with basic authorization
@@ -156,17 +157,17 @@ class Curl_client {
             $params = array();
             if ($args[ 'request_data' ]){
                 foreach( $args[ 'request_data' ] as $key => $value ) {
-                    $params[] = "{$key}={$args[ 'request_data' ][$key]}";
+                    $params[] = "$key=". urlencode( $args[ 'request_data' ][$key] );
                 }
             }
 
-            $requestUrl .= implode('&', $params);
+            $requestUrl .= implode( '&', $params );
 
             // Clean up
             $request_data = NULL;
 
         } 
-
+        
         $this->client = curl_init(); 
 
         if( is_array( $request_data ) ) {
@@ -252,7 +253,7 @@ class Curl_client {
         /**
          * Execute and process curl call 
          */
-        
+
         $results = curl_exec( $this->client ); 
         $response = $this->format_results( $results );  
         curl_close( $this->client ); 
@@ -299,7 +300,7 @@ class Curl_client {
             $status_code !== 206 
         ) { 
             $error = true;
-
+  
             if( curl_error( $this->client ) ) {
                 $message = curl_error( $this->client ); 
             } else { 

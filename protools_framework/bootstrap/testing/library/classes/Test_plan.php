@@ -8,12 +8,10 @@ use Symfony\Component\Process\Process as Process;
 
 use Bootstrap\Shared\Utilities\Classes\Environment_configuration as Environment_configuration; 
 use Bootstrap\Shared\Utilities\Classes\Json_validator as Json_validator;
-use Bootstrap\Shared\Utilities\Classes\Api_response as Api_response;
+use Bootstrap\Shared\Utilities\Classes\Static\Api_response as Api_response;
 
 use PHPUnit\Util\TestDox\NamePrettifier as NamePrettifier;
-
 use \Exception;
-use \Dump_var as Dump_var;
 use \DOMDocument;
 use \SimpleXMLElement;
 
@@ -173,7 +171,7 @@ class Test_plan {
             $test_suites[ $requested_resource  ][ 'test_scripts' ] = array();
             $test_suites[ $requested_resource  ][ 'test_scripts' ][ $requested_view ] = $test_script;
 
-            $response = $this->Response->get_response( array(
+            $response = $this->Response->format_response( array(
                 'status' => 200, 
                 'error' => false,
                 'issue_id' => 'test_plan_016', 
@@ -203,7 +201,7 @@ class Test_plan {
                         $test_suites[ $requested_resource ][ 'test_scripts' ][ $requested_view ][ 'script_location' ] = $suite_data[ 'script_location' ] . $tmp_script_key . '.php';
                         $test_case_found = true;
 
-                        $response = $this->Response->get_response( array(
+                        $response = $this->Response->format_response( array(
                             'status' => 200, 
                             'error' => false,
                             'issue_id' => 'test_plan_015', 
@@ -228,7 +226,7 @@ class Test_plan {
 
         if( !$test_case_found ) {
 
-            $response = $this->Response->get_response( array(
+            $response = $this->Response->format_response( array(
                 'status' => 500, 
                 'issue_id' => 'test_plan_014', 
                 'source' => get_class(), 
@@ -262,7 +260,7 @@ class Test_plan {
         $git_log_response = shell_exec( 'git log -1 --pretty=%B' );
         $git_last_commit_message = preg_replace('~[[:cntrl:]]~', '', $git_log_response);
 
-        return $this->Response->get_response( array(
+        return $this->Response->format_response( array(
             'status' => 200, 
             'error' => false,
             'issue_id' => 'test_plan_013', 
@@ -282,7 +280,7 @@ class Test_plan {
 
         if( $app_path[ 'application' ] === 'default' ) {
 
-            $get_plan_response = $this->Response->get_response( array(
+            $get_plan_response = $this->Response->format_response( array(
                 'status' => 404, 
                 'issue_id' => 'test_plan_001',
                 'message' => 'Test plan not provided', 
@@ -304,7 +302,7 @@ class Test_plan {
 
                 } else {
 
-                    $get_plan_response = $this->Response->get_response( array(
+                    $get_plan_response = $this->Response->format_response( array(
                         'status' => 200,
                         'error' => false, 
                         'issue_id' => 'test_plan_003',
@@ -317,7 +315,7 @@ class Test_plan {
 
             } else {
 
-                $get_plan_response = $this->Response->get_response( array(
+                $get_plan_response = $this->Response->format_response( array(
                     'status' => 404, 
                     'issue_id' => 'test_plan_002',
                     'message' => 'Test plan not found', 
@@ -341,7 +339,7 @@ class Test_plan {
         
         if( !$is_existing_suite ) {
 
-            return $this->Response->get_response( array(
+            return $this->Response->format_response( array(
                 'status' => 404, 
                 'issue_id' => 'test_plan_006', 
                 'message' => 'Test suite not found', 
@@ -364,7 +362,7 @@ class Test_plan {
                     if( $specific_test_suite_response[ 'error' ] ) {
 
                         // Report errors
-                        return $this->Response->get_response( array(
+                        return $this->Response->format_response( array(
                             'status' => $specific_test_suite_response[ 'status' ], 
                             'issue_id' => 'test_plan_008', 
                             'message' => $specific_test_suite_response[ 'message' ] . '; Test Suite - ' . $test_plan_suites[ $i ],
@@ -381,7 +379,7 @@ class Test_plan {
                 } else { 
 
                     // Report errors
-                    $response = $this->Response->get_response( array(
+                    $response = $this->Response->format_response( array(
                         'status' => 404, 
                         'issue_id' => 'test_plan_007', 
                         'message' => 'Test suite not found. Test name - ' . $test_plan_suites[ $i ], 
@@ -404,7 +402,7 @@ class Test_plan {
                 if( $specific_test_suite_response[ 'error' ] ) {
 
                     // Report rrors
-                    return $this->Response->get_response( array(
+                    return $this->Response->format_response( array(
                         'status' => $specific_test_suite_response[ 'status' ], 
                         'issue_id' => 'test_plan_009', 
                         'message' => $specific_test_suite_response[ 'message' ] . '; Test Suite - ' . $specific_test_suite,
@@ -426,7 +424,7 @@ class Test_plan {
             return $response;
         } else {
             // Return test suites
-            return $this->Response->get_response( array(
+            return $this->Response->format_response( array(
                 'error' => false, 
                 'status' => 200, 
                 'issue_id' => 'test_plan_010', 
@@ -440,7 +438,7 @@ class Test_plan {
 
     Public function get_test_report() : array {
 
-        return $get_plan_response = $this->Response->get_response( array(
+        return $get_plan_response = $this->Response->format_response( array(
             'status' => $this->system[ 'status' ],
             'error' => $this->system[ 'error' ],  
             'issue_id' => 'test_plan_004', 
@@ -454,7 +452,7 @@ class Test_plan {
 
     Public function get_plan_summary() : array {
 
-        return $get_plan_response = $this->Response->get_response( array(
+        return $get_plan_response = $this->Response->format_response( array(
             'error' => $this->system[ 'error' ],
             'status' => 200, 
             'issue_id' => 'test_plan_011',
@@ -949,7 +947,7 @@ class Test_plan {
         // When test is complete then move sempaphore to archive
         $Filesystem->rename( $test_config_file, $test_config_file_archive, true );
 
-        return $this->Response->get_response( array(
+        return $this->Response->format_response( array(
             'status' => $this->system[ 'status' ],
             'error' => $this->system[ 'error' ],  
             'issue_id' => 'test_plan_015', 

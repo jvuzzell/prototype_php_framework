@@ -6,7 +6,6 @@ use Bootstrap\Shared\Utilities\Classes\Environment_configuration as Environment_
 use Bootstrap\Shared\Utilities\Classes\Json_validator as Json_validator;
 use Bootstrap\Shared\Utilities\Classes\Static\Api_response as Api_response;
 
-use \Dump_var;
 use ErrorException;
 
 class Api_handler {
@@ -55,9 +54,9 @@ class Api_handler {
                 $resolver_directory = $portfolio_directories[ 'site_specific' ] . $this->env_var[ 'route' ][ 'api' ]; 
                 break;
 
-            case ( is_dir( $portfolio_directories[ 'shared' ] . $this->env_var[ 'route' ][ 'api' ] ) ) : 
+            case ( is_dir( $portfolio_directories[ 'shared' ] . 'api/' . $this->env_var[ 'route' ][ 'api' ] ) ) : 
 
-                $resolver_directory = $portfolio_directories[ 'shared' ] . $this->env_var[ 'route' ][ 'api' ]; 
+                $resolver_directory = $portfolio_directories[ 'shared' ] . 'api/' . $this->env_var[ 'route' ][ 'api' ]; 
                 break; 
 
             default :
@@ -279,10 +278,15 @@ class Api_handler {
         }
         
         // Resolve response fields w/ request results
-
-        $request_results = $this->validate_client_request_body( 'responses', $request_results[ 'data' ] );
         $endpoint_results = $response_resolver->resolve_request( $request_results[ 'data' ] );
+    
+        $response_data = ( isset( $endpoint_results[ 'data' ] ) ) ? $endpoint_results[ 'data' ] : $endpoint_results;
 
+        $this->api_response->on_error(
+            'print_json_to_screen', 
+            $this->validate_client_request_body( 'responses', $response_data )
+        );
+    
         // Print results (Failure or Success)
         return $endpoint_results;
 

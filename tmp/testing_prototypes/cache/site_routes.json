@@ -1,4 +1,13 @@
 {
+    "error" : {
+        "resources" : { 
+            "default" : {
+                "views" : {
+                    "default" : "error_page/resources/page_display_error/app.php"
+                }
+            }
+        }
+    },
     "results" : {
         "resources" : {
             "default" : {

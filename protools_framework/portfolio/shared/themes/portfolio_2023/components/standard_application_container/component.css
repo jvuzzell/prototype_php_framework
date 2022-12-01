@@ -1,0 +1,61 @@
+.main-container,
+.sidebar-container, 
+.content-container, 
+.app-container {
+    display: inline-block; 
+    font-size: 0; 
+    position: relative; 
+}
+
+.main-container {
+    width: 100vw;
+    height: 100vh;
+    position: absolute;  
+}
+
+.sidebar-container {
+    height: 100%; 
+    max-height: 100vh; 
+    position: fixed; 
+    z-index: 3;
+    transform: translate(0,60px); /* 60px for navigation*/
+    height: 5000px; 
+    transition: all 225ms ease-in-out;
+}
+
+.content-container { 
+    width: 100%; 
+    transition: all 225ms ease-in-out;  
+    z-index: -1;
+    position: relative;
+}
+
+.main-container .content-container {
+    width: calc(100% - 100px);
+    position: absolute;
+    transform: translate(100px, 60px); /* 100px for Sidebar closed, 60px for navigation */
+}
+
+.main-container[data-sidebar="open"] .sidebar-container {
+    width: 300px;
+    max-width: 300px; 
+}
+
+.main-container[data-sidebar="open"] .content-container {
+    width: calc(100% - 300px);
+    transform: translate(300px, 60px); /* 300px for Sidebar open, 60px for navigation */
+}
+
+.main-container[data-sidebar="closed"] .sidebar-container {
+    width: 110px;
+    max-width: 110px; 
+}
+
+.main-container[data-sidebar="closed"] .content-container {
+    width: calc(100% - 110px);
+    transform: translate(110px, 60px); /* 300px for Sidebar open, 60px for navigation */
+}
+
+.main-content {
+	min-height: 100vh;
+}

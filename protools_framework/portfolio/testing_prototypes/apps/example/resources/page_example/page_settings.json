@@ -1,4 +1,8 @@
 {
     "theme" : "common",
-    "template" : "sample_template/template.html.twig"
+    "template" : "template.html.twig", 
+    "template_directory" : "sample_template", 
+    "page_meta" : {
+        "title" : "Sample Page"
+    }
 }

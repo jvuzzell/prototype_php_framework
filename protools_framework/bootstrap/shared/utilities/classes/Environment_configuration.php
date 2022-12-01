@@ -350,8 +350,9 @@ class Environment_configuration {
         } else {
 
             $response = $this->Api_response->format_response( array(
-                'status'   => 404,
+                'status'   => 500,
                 'issue_id' => 'environment_config_014', 
+                'log'      => 'true',
                 'message'  => 'Environment domain file not found', 
                 'source'   => get_class()
             ) );
@@ -435,9 +436,11 @@ class Environment_configuration {
         } else {
 
             $response = $this->Api_response->format_response( array(
-                'status'   => 404,
+                'status'   => 500,
                 'issue_id' => 'environment_config_011', 
                 'message'  => 'Client not found', 
+                'log'      => 'true',
+                'private'  => 'true',
                 'source'   => get_class(), 
                 'data' => array( 'missing_client_name' => $client_name )
             ) );
@@ -460,9 +463,11 @@ class Environment_configuration {
         } else {
 
             $response = $this->Api_response->format_response( array(
-                'status'   => 404,
+                'status'   => 500,
                 'issue_id' => 'environment_config_007', 
                 'message'  => 'Environment domain file not found', 
+                'log'      => 'true',
+                'private'  => 'true',
                 'source'   => get_class()
             ) );
 
@@ -500,9 +505,11 @@ class Environment_configuration {
         } else {
 
             $response = $this->Api_response->format_response( array(
-                'status'   => 404,
+                'status'   => 500,
                 'issue_id' => 'environment_config_005', 
                 'message'  => 'Environment name not found', 
+                'log'      => 'true',
+                'private'  => 'true',
                 'source'   => get_class()
             ) );
 
@@ -538,9 +545,11 @@ class Environment_configuration {
         if( $combined_data_sources === null ) {
 
             $response = $this->Api_response->format_response( array(
-                'status'   => 404,
+                'status'   => 500,
                 'issue_id' => 'environment_config_003', 
                 'message'  => 'data_sources - data sources not found', 
+                'log'      => 'true',
+                'private'  => 'true',
                 'source'   => get_class()
             ) );
 
@@ -550,7 +559,7 @@ class Environment_configuration {
                 'error'    => false,
                 'status'   => 200,
                 'issue_id' => 'environment_config_004', 
-                'message'  => 'data_sources - data sources found', 
+                'message'  => 'data_sources - data sources found',
                 'source'   => get_class(), 
                 'data'     => $combined_data_sources
             ) );
@@ -577,13 +586,15 @@ class Environment_configuration {
 
         if( 
             $matching_search_response[ 'error' ] === true || 
-            $matching_search_response[ 'status' ] === 404
+            $matching_search_response[ 'status' ] === 500
         ) {
 
             $response = $this->Api_response->format_response( array(
                 'status'   => 500,
                 'issue_id' => 'environment_config_008', 
-                'message'  => $matching_search_response[ 'message' ] . ' - missing site specific directories', 
+                'message'  => $matching_search_response[ 'message' ] . ' - missing site specific directories',
+                'log'      => 'true',
+                'private'  => 'true', 
                 'source'   => get_class()
             ) );
 
@@ -669,13 +680,15 @@ class Environment_configuration {
         
         if( 
             $matching_search_response[ 'error' ] === true || 
-            $matching_search_response[ 'status' ] === 404
+            $matching_search_response[ 'status' ] === 500
         ) {
 
             $response = $this->Api_response->format_response( array(
-                'status'   => 404,
+                'status'   => 500,
                 'issue_id' => 'environment_config_001', 
                 'message'  => $matching_search_response[ 'message' ] . ' - missing environment_variables', 
+                'log'      => 'true',
+                'private'  => 'true',
                 'source'   => get_class()
             ) );
 
@@ -752,6 +765,7 @@ class Environment_configuration {
 
         $meta = array();
         $request_meta = array(
+            'base_url' => null,
             'method' => null, // string, Request method
             'protocol' => null, // string, HTTP or HTTPS
             'bearer_token' => null, // string, JWT
@@ -772,11 +786,15 @@ class Environment_configuration {
 
         } else {
 
+            $protocol = $this->set_request_protocol(); 
+            $headers = $this->get_request_header(); 
+            
             $meta = array(
                 'method' => $_SERVER[ 'REQUEST_METHOD' ], 
-                'protocol' => $this->set_request_protocol(),
+                'protocol' => $protocol,
                 'bearer_token' => $this->get_bearer_token(),
-                'headers' => $this->get_request_header(),
+                'base_url' => $protocol . '://' . $headers[ 'Host' ] . '/',
+                'headers' => $headers,
                 'remote_address' => $_SERVER[ 'REMOTE_ADDR' ], 
                 'remote_port' => $_SERVER[ 'REMOTE_PORT' ], 
                 'request_time_float' => $_SERVER[ 'REQUEST_TIME_FLOAT' ], 

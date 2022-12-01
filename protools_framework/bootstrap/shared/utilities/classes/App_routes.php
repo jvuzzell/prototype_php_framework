@@ -3,7 +3,6 @@
 namespace Bootstrap\Shared\Utilities\Classes;
 
 use Bootstrap\Shared\Utilities\Classes\Static\Api_response as Api_response; 
-use \Dump_var;
 
 class App_routes {
 
@@ -55,6 +54,8 @@ class App_routes {
                     'status' => 404,
                     'issue_id' => 'app_routes_005',
                     'message' => 'View not found', 
+                    'log' => true, 
+                    'private' => true,
                     'source' => get_class()
                 ]);
 
@@ -65,6 +66,8 @@ class App_routes {
             $response = $this->Response->format_response([
                 'status' => 404,
                 'issue_id' => 'app_routes_004',
+                'log' => true, 
+                'private' => true,
                 'message' => 'Resource not found', 
                 'source' => get_class()
             ]);
@@ -72,6 +75,8 @@ class App_routes {
         }
 
         if( $response[ 'error' ] ) {
+            $response[ 'system' ][ 'log' ] = true; 
+            $response[ 'system' ][ 'private' ] = true;
             $response[ 'message' ] = 'Page not found';   
         }
 
@@ -102,6 +107,8 @@ class App_routes {
             $response = $this->Response->format_response([
                 'status' => 404,
                 'issue_id' => 'app_routes_002',
+                'log' => true, 
+                'private' => true,
                 'message' => 'Application not found', 
                 'source' => get_class()
             ]);

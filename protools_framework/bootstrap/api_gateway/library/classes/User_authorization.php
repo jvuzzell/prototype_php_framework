@@ -5,7 +5,7 @@ namespace Bootstrap\Api_gateway\Library\Classes;
 use Bootstrap\Shared\Utilities\Classes\Environment_configuration;
 use Bootstrap\Shared\Utilities\Classes\Static\Api_response;
 use Bootstrap\Api_gateway\Library\Classes\Jwt_management as Jwt_mgmt; 
-use \Dump_var;
+
 use ErrorException;
 
 class User_authorization {
@@ -27,7 +27,7 @@ class User_authorization {
         switch( $permission_type ) {
             case 'localhost':
         
-                if( ENV_VAR[ 'request' ][ 'remote_address' ] !== '127.0.0.1' ) {
+                if( $this->env_var[ 'request' ][ 'remote_address' ] !== '127.0.0.1' ) {
         
                     $response = $this->api_response->format_response( array(
                         'status' => 403, 
@@ -55,7 +55,6 @@ class User_authorization {
             case 'basic' : 
 
                 $bearer_token = $this->env_var[ 'request' ][ 'bearer_token' ];
-
                 $Jwt_mgmt = new Jwt_mgmt( $this->env_var, $this->api_response );
                 $response = $Jwt_mgmt->get_claims( $bearer_token );
                 
