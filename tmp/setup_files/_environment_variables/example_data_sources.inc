@@ -19,12 +19,6 @@ return array(
                 'request_url'        => 'http://api.prototypes.dv',
                 'bearer_token'       => '',
                 'authorization_type' => 'bearer-token'
-            ),
-            'atlassian_rest_api' => array(
-                'request_url'        => 'https://uzzell-cc-pro.atlassian.net',
-                'username'           => 'josh.uzzell@gmail.com',
-                'password'           => 'CuXb6t0Yk0Gpu6zwPy4B0187',
-                'authorization_type' => 'base64'
             )
         ),
         'email_server' => array(
